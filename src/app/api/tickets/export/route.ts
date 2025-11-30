@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { tickets, users, tableConfigs } from '@/lib/storage';
+import { tickets, users } from '@/lib/storage';
 import * as XLSX from 'xlsx';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user) {
@@ -14,8 +14,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Devi far parte di un team' }, { status: 400 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const format = searchParams.get('format') || 'xlsx';
+
     const teamTickets = tickets.getByTeam(session.user.teamId);
-    const config = tableConfigs.getDefaultByTeam(session.user.teamId);
 
     // Prepare data for export
     const exportData = teamTickets.map(ticket => {
@@ -25,8 +27,8 @@ export async function GET() {
       const baseData: Record<string, unknown> = {
         'Nome Ticket': ticket.name,
         'Descrizione': ticket.description || '',
-        'Stato': ticket.status,
-        'Priorità': ticket.priority,
+        'Stato': ticket.status === 'open' ? 'Aperto' : ticket.status === 'in_progress' ? 'In Corso' : ticket.status === 'resolved' ? 'Risolto' : 'Chiuso',
+        'Priorità': ticket.priority === 'low' ? 'Bassa' : ticket.priority === 'medium' ? 'Media' : ticket.priority === 'high' ? 'Alta' : 'Critica',
         'Tempo di Reazione (min)': ticket.reactionTime || '',
         'Tempo di Risoluzione (min)': ticket.resolutionTime || '',
         'Autore': author?.name || '',
@@ -50,7 +52,22 @@ export async function GET() {
       return baseData;
     });
 
-    // Create workbook
+    const dateStr = new Date().toISOString().split('T')[0];
+
+    if (format === 'csv') {
+      // Generate CSV
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const csv = XLSX.utils.sheet_to_csv(worksheet, { FS: ';' });
+
+      return new NextResponse(csv, {
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="tickets_${dateStr}.csv"`,
+        },
+      });
+    }
+
+    // Create workbook for Excel
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(exportData);
 
@@ -78,7 +95,7 @@ export async function GET() {
     return new NextResponse(buffer, {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="tickets_${new Date().toISOString().split('T')[0]}.xlsx"`,
+        'Content-Disposition': `attachment; filename="tickets_${dateStr}.xlsx"`,
       },
     });
   } catch (error) {
