@@ -1,0 +1,37 @@
+{
+  "name": "allos-workfield",
+  "version": "1.0.0",
+  "description": "Piattaforma di lavoro collaborativo per team - Note condivise, gestione ticket e desktop agent",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "setup": "mkdir -p data && npm run dev"
+  },
+  "keywords": ["workspace", "collaboration", "team", "notes", "tickets"],
+  "author": "Allos WorkField",
+  "license": "MIT",
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/uuid": "^10.0.0",
+    "autoprefixer": "^10.4.22",
+    "bcryptjs": "^3.0.3",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.23.24",
+    "lucide-react": "^0.555.0",
+    "next": "^14.2.33",
+    "next-auth": "^5.0.0-beta.30",
+    "postcss": "^8.5.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3",
+    "uuid": "^13.0.0",
+    "xlsx": "^0.18.5",
+    "zustand": "^5.0.9"
+  }
+}
