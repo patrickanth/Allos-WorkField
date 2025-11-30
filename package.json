@@ -10,10 +10,17 @@
     "lint": "next lint",
     "setup": "mkdir -p data && npm run dev"
   },
-  "keywords": ["workspace", "collaboration", "team", "notes", "tickets"],
+  "keywords": [
+    "workspace",
+    "collaboration",
+    "team",
+    "notes",
+    "tickets"
+  ],
   "author": "Allos WorkField",
   "license": "MIT",
   "dependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
