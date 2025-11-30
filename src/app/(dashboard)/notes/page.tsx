@@ -141,245 +141,260 @@ export default function NotesPage() {
   const canShare = session?.user?.teamId;
 
   return (
-    <div className="p-8 min-h-screen">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-light text-neutral-100 tracking-wide">
-            {view === 'private' ? 'Note Personali' : 'Note Team'}
-          </h1>
-          <p className="text-sm text-neutral-500 mt-1">
-            {view === 'private'
-              ? 'Visibili solo a te'
-              : canShare
-                ? 'Condivise con il team'
-                : 'Unisciti a un team per vedere le note condivise'
-            }
-          </p>
-        </div>
-        <button
-          onClick={openCreateModal}
-          className="group relative px-6 py-3 bg-neutral-900 border border-neutral-800 rounded-xl text-sm text-neutral-200 hover:border-neutral-600 hover:bg-neutral-800 transition-all duration-300 overflow-hidden"
-        >
-          <span className="relative z-10">Nuova nota</span>
-          <div className="absolute inset-0 bg-gradient-to-r from-neutral-800 to-neutral-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </button>
-      </div>
+    <div className="min-h-screen px-12 py-10 relative">
+      {/* Decorative lamp effect */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-b from-indigo-500/50 to-transparent" />
+      <div className="absolute top-32 left-1/2 -translate-x-1/2 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl" />
 
-      {/* Search */}
-      <div className="mb-8">
-        <div className="relative max-w-md">
-          <input
-            type="text"
-            placeholder="Cerca nelle note..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 focus:bg-neutral-900 transition-all duration-300"
-          />
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-600">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+      {/* Content wrapper - more centered */}
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="flex items-end justify-between mb-12 pt-8">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-3">
+              {view === 'private' ? 'Spazio Personale' : 'Spazio Condiviso'}
+            </p>
+            <h1 className="text-4xl font-extralight text-white tracking-tight">
+              {view === 'private' ? 'Note' : 'Note Team'}
+            </h1>
+            <p className="text-sm text-neutral-500 mt-2 font-light">
+              {view === 'private'
+                ? 'Le tue annotazioni private'
+                : canShare
+                  ? 'Condivise con il tuo team'
+                  : 'Unisciti a un team per collaborare'
+              }
+            </p>
           </div>
-        </div>
-      </div>
 
-      {/* Notes Grid */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-6 animate-pulse">
-              <div className="h-3 bg-neutral-800 rounded w-16 mb-4" />
-              <div className="space-y-2">
-                <div className="h-4 bg-neutral-800 rounded w-full" />
-                <div className="h-4 bg-neutral-800 rounded w-3/4" />
-              </div>
+          <button
+            onClick={openCreateModal}
+            className="glow-button px-8 py-3.5 bg-white/[0.03] border border-white/10 rounded-2xl text-sm text-white/80 hover:text-white hover:bg-white/[0.06] hover:border-white/20 transition-all duration-500"
+          >
+            Nuova nota
+          </button>
+        </div>
+
+        {/* Search */}
+        <div className="mb-10">
+          <div className="relative max-w-lg">
+            <input
+              type="text"
+              placeholder="Cerca nelle note..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white/[0.02] border border-white/[0.06] rounded-2xl px-6 py-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/15 focus:bg-white/[0.04] transition-all duration-500"
+            />
+            <div className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </div>
-          ))}
-        </div>
-      ) : filteredNotes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24">
-          <div className="w-16 h-16 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-6">
-            <svg className="w-7 h-7 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
           </div>
-          <p className="text-neutral-500 text-sm mb-2">
-            {searchQuery ? 'Nessun risultato' : 'Nessuna nota'}
-          </p>
-          {!searchQuery && (
-            <button
-              onClick={openCreateModal}
-              className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors mt-2"
-            >
-              Crea la prima nota
-            </button>
-          )}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNotes.map((note) => (
-            <div
-              key={note.id}
-              className="group bg-neutral-900/30 border border-neutral-800/50 rounded-2xl p-6 hover:bg-neutral-900/60 hover:border-neutral-700/50 transition-all duration-500 relative"
-            >
-              {/* Menu */}
-              {note.authorId === session?.user?.id && (
-                <div className="absolute top-4 right-4">
-                  <button
-                    onClick={() => setOpenMenuId(openMenuId === note.id ? null : note.id)}
-                    className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-neutral-800 transition-all duration-300 text-neutral-500"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                    </svg>
-                  </button>
 
-                  {openMenuId === note.id && (
-                    <div className="absolute right-0 mt-2 w-44 bg-neutral-900 border border-neutral-800 rounded-xl py-2 shadow-2xl z-20">
-                      <button
-                        onClick={() => openEditModal(note)}
-                        className="w-full text-left px-4 py-2.5 text-sm text-neutral-300 hover:bg-neutral-800 transition-colors"
-                      >
-                        Modifica
-                      </button>
-                      {canShare && (
+        {/* Notes Grid */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="glass-card rounded-3xl p-8 animate-pulse">
+                <div className="h-3 bg-white/5 rounded w-20 mb-6" />
+                <div className="space-y-3">
+                  <div className="h-4 bg-white/5 rounded w-full" />
+                  <div className="h-4 bg-white/5 rounded w-4/5" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredNotes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-32 text-center">
+            {/* Decorative element */}
+            <div className="relative mb-8">
+              <div className="w-24 h-24 rounded-full bg-white/[0.02] border border-white/[0.06] flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-white/[0.02] border border-white/[0.04] flex items-center justify-center">
+                  <svg className="w-7 h-7 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+              </div>
+              {/* Glow behind */}
+              <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur-2xl -z-10" />
+            </div>
+            <p className="text-white/40 text-base mb-3 font-light">
+              {searchQuery ? 'Nessun risultato trovato' : 'Nessuna nota presente'}
+            </p>
+            {!searchQuery && (
+              <button
+                onClick={openCreateModal}
+                className="text-sm text-white/30 hover:text-white/60 transition-colors duration-300"
+              >
+                Crea la tua prima nota
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredNotes.map((note) => (
+              <div
+                key={note.id}
+                className="glass-card rounded-3xl p-8 group relative transition-all duration-500"
+              >
+                {/* Chrome accent line */}
+                <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                {/* Menu */}
+                {note.authorId === session?.user?.id && (
+                  <div className="absolute top-6 right-6">
+                    <button
+                      onClick={() => setOpenMenuId(openMenuId === note.id ? null : note.id)}
+                      className="p-2.5 rounded-xl opacity-0 group-hover:opacity-100 hover:bg-white/5 transition-all duration-300 text-white/30 hover:text-white/60"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </button>
+
+                    {openMenuId === note.id && (
+                      <div className="absolute right-0 mt-2 w-48 bg-[#151515] border border-white/10 rounded-2xl py-2 shadow-2xl z-20 backdrop-blur-xl">
                         <button
-                          onClick={() => handleTogglePrivacy(note)}
-                          className="w-full text-left px-4 py-2.5 text-sm text-neutral-300 hover:bg-neutral-800 transition-colors"
+                          onClick={() => openEditModal(note)}
+                          className="w-full text-left px-5 py-3 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
                         >
-                          {note.isPrivate ? 'Condividi con team' : 'Rendi privata'}
+                          Modifica
                         </button>
-                      )}
-                      <button
-                        onClick={() => handleDeleteNote(note.id)}
-                        className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-neutral-800 transition-colors"
-                      >
-                        Elimina
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Privacy badge */}
-              <div className="mb-4">
-                <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-full ${
-                  note.isPrivate
-                    ? 'bg-neutral-800/80 text-neutral-400'
-                    : 'bg-emerald-950/50 text-emerald-400 border border-emerald-900/30'
-                }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${note.isPrivate ? 'bg-neutral-500' : 'bg-emerald-400'}`} />
-                  {note.isPrivate ? 'Privata' : 'Team'}
-                </span>
-              </div>
-
-              {/* Content */}
-              <p className="text-sm text-neutral-300 whitespace-pre-wrap line-clamp-5 mb-6 leading-relaxed">
-                {note.content}
-              </p>
-
-              {/* Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-neutral-800/50">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-[10px] text-neutral-400">
-                    {note.author?.name?.charAt(0).toUpperCase()}
+                        {canShare && (
+                          <button
+                            onClick={() => handleTogglePrivacy(note)}
+                            className="w-full text-left px-5 py-3 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                          >
+                            {note.isPrivate ? 'Condividi con team' : 'Rendi privata'}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDeleteNote(note.id)}
+                          className="w-full text-left px-5 py-3 text-sm text-red-400/80 hover:text-red-400 hover:bg-white/5 transition-colors"
+                        >
+                          Elimina
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <span className="text-xs text-neutral-500">{note.author?.name}</span>
+                )}
+
+                {/* Privacy indicator */}
+                <div className="mb-6">
+                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] uppercase tracking-widest ${
+                    note.isPrivate
+                      ? 'bg-white/[0.03] text-white/40'
+                      : 'bg-emerald-500/10 text-emerald-400/80'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${note.isPrivate ? 'bg-white/30' : 'bg-emerald-400'}`} />
+                    {note.isPrivate ? 'Privata' : 'Team'}
+                  </div>
                 </div>
-                <span className="text-xs text-neutral-600">
-                  {format(new Date(note.timestamp), 'HH:mm · d MMM', { locale: it })}
-                </span>
+
+                {/* Content */}
+                <p className="text-base text-white/70 whitespace-pre-wrap line-clamp-4 mb-8 leading-relaxed font-light">
+                  {note.content}
+                </p>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between pt-6 border-t border-white/[0.04]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-xs text-white/40">
+                      {note.author?.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-sm text-white/40 font-light">{note.author?.name}</span>
+                  </div>
+                  <span className="text-xs text-white/20 font-light">
+                    {format(new Date(note.timestamp), 'HH:mm · d MMM', { locale: it })}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-lg shadow-2xl">
-            <div className="p-6 border-b border-neutral-800">
-              <h2 className="text-lg font-light text-neutral-100 tracking-wide">
-                {editingNote ? 'Modifica nota' : 'Nuova nota'}
-              </h2>
-            </div>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+          <div className="bg-[#0f0f0f] border border-white/10 rounded-3xl w-full max-w-xl shadow-2xl relative overflow-hidden">
+            {/* Decorative light */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2" />
 
-            <div className="p-6 space-y-6">
-              <textarea
-                value={newNoteContent}
-                onChange={(e) => setNewNoteContent(e.target.value)}
-                placeholder="Scrivi qui la tua nota..."
-                rows={6}
-                className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 resize-none transition-all duration-300"
-                autoFocus
-              />
-
-              <div className="flex items-center gap-6">
-                <label className="flex items-center gap-3 cursor-pointer group">
-                  <div className={`relative w-5 h-5 rounded-full border-2 transition-all duration-300 ${
-                    newNotePrivate ? 'border-neutral-400 bg-neutral-400' : 'border-neutral-600'
-                  }`}>
-                    {newNotePrivate && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-2 h-2 rounded-full bg-neutral-950" />
-                      </div>
-                    )}
-                  </div>
-                  <input
-                    type="radio"
-                    name="privacy"
-                    checked={newNotePrivate}
-                    onChange={() => setNewNotePrivate(true)}
-                    className="sr-only"
-                  />
-                  <span className="text-sm text-neutral-400 group-hover:text-neutral-200 transition-colors">Privata</span>
-                </label>
-
-                <label className={`flex items-center gap-3 ${canShare ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'} group`}>
-                  <div className={`relative w-5 h-5 rounded-full border-2 transition-all duration-300 ${
-                    !newNotePrivate ? 'border-emerald-400 bg-emerald-400' : 'border-neutral-600'
-                  }`}>
-                    {!newNotePrivate && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-2 h-2 rounded-full bg-neutral-950" />
-                      </div>
-                    )}
-                  </div>
-                  <input
-                    type="radio"
-                    name="privacy"
-                    checked={!newNotePrivate}
-                    onChange={() => canShare && setNewNotePrivate(false)}
-                    disabled={!canShare}
-                    className="sr-only"
-                  />
-                  <span className="text-sm text-neutral-400 group-hover:text-neutral-200 transition-colors">Condivisa</span>
-                </label>
+            <div className="relative">
+              <div className="px-8 py-6 border-b border-white/[0.06]">
+                <h2 className="text-xl font-light text-white tracking-tight">
+                  {editingNote ? 'Modifica nota' : 'Nuova nota'}
+                </h2>
               </div>
 
-              {!canShare && (
-                <p className="text-xs text-amber-500/80 bg-amber-950/20 px-3 py-2 rounded-lg border border-amber-900/30">
-                  Unisciti a un team per condividere le note
-                </p>
-              )}
-            </div>
+              <div className="p-8 space-y-6">
+                <textarea
+                  value={newNoteContent}
+                  onChange={(e) => setNewNoteContent(e.target.value)}
+                  placeholder="Scrivi qui..."
+                  rows={6}
+                  className="w-full bg-white/[0.02] border border-white/[0.06] rounded-2xl px-5 py-4 text-base text-white placeholder-white/20 focus:outline-none focus:border-white/15 resize-none transition-all duration-300 font-light"
+                  autoFocus
+                />
 
-            <div className="p-6 border-t border-neutral-800 flex justify-end gap-4">
-              <button
-                onClick={() => { setIsModalOpen(false); setEditingNote(null); setNewNoteContent(''); }}
-                className="px-5 py-2.5 text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
-              >
-                Annulla
-              </button>
-              <button
-                onClick={editingNote ? handleUpdateNote : handleCreateNote}
-                disabled={!newNoteContent.trim() || isSubmitting}
-                className="px-6 py-2.5 bg-neutral-100 text-neutral-900 text-sm font-medium rounded-xl hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Salvataggio...' : (editingNote ? 'Salva' : 'Crea')}
-              </button>
+                <div className="flex items-center gap-6">
+                  <button
+                    type="button"
+                    onClick={() => setNewNotePrivate(true)}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 ${
+                      newNotePrivate ? 'bg-white/[0.06] text-white' : 'text-white/40 hover:text-white/60'
+                    }`}
+                  >
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
+                      newNotePrivate ? 'border-white bg-white' : 'border-white/30'
+                    }`}>
+                      {newNotePrivate && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
+                    </div>
+                    <span className="text-sm">Privata</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => canShare && setNewNotePrivate(false)}
+                    disabled={!canShare}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 ${
+                      !newNotePrivate ? 'bg-emerald-500/10 text-emerald-400' : 'text-white/40 hover:text-white/60'
+                    } ${!canShare ? 'opacity-40 cursor-not-allowed' : ''}`}
+                  >
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
+                      !newNotePrivate ? 'border-emerald-400 bg-emerald-400' : 'border-white/30'
+                    }`}>
+                      {!newNotePrivate && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
+                    </div>
+                    <span className="text-sm">Team</span>
+                  </button>
+                </div>
+
+                {!canShare && (
+                  <p className="text-xs text-amber-400/60 bg-amber-500/5 border border-amber-500/10 px-4 py-3 rounded-xl">
+                    Unisciti a un team per condividere le note
+                  </p>
+                )}
+              </div>
+
+              <div className="px-8 py-6 border-t border-white/[0.06] flex justify-end gap-4">
+                <button
+                  onClick={() => { setIsModalOpen(false); setEditingNote(null); setNewNoteContent(''); }}
+                  className="px-6 py-3 text-sm text-white/40 hover:text-white/70 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={editingNote ? handleUpdateNote : handleCreateNote}
+                  disabled={!newNoteContent.trim() || isSubmitting}
+                  className="glow-button px-8 py-3 bg-white text-black text-sm font-medium rounded-xl hover:bg-white/90 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Salvataggio...' : (editingNote ? 'Salva' : 'Crea')}
+                </button>
+              </div>
             </div>
           </div>
         </div>
