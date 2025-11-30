@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -11,6 +11,11 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,13 +43,47 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-6">
-      <div className="w-full max-w-sm">
-        <div className="mb-10 text-center">
-          <h1 className="text-2xl font-light text-neutral-100 tracking-wide mb-2">
-            WorkField
-          </h1>
-          <div className="w-8 h-px bg-neutral-800 mx-auto" />
+    <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Subtle background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-neutral-900/50 blur-[150px] pointer-events-none" />
+
+      <div className="w-full max-w-sm relative z-10">
+        {/* Allos Branding */}
+        <div className="mb-12 text-center">
+          {/* Allos - Elegant title */}
+          <div className="mb-6">
+            <h1
+              className="text-5xl font-extralight tracking-[0.35em] text-neutral-200 uppercase"
+              style={{
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                letterSpacing: '0.35em',
+                textIndent: '0.35em',
+              }}
+            >
+              {mounted && 'Allos'.split('').map((letter, i) => (
+                <span
+                  key={i}
+                  className="inline-block"
+                  style={{
+                    opacity: 0,
+                    animation: `fadeIn 0.6s ease forwards`,
+                    animationDelay: `${i * 0.1}s`,
+                  }}
+                >
+                  {letter}
+                </span>
+              ))}
+            </h1>
+          </div>
+
+          {/* WorkField subtitle */}
+          <div className="flex items-center justify-center gap-4">
+            <div className="w-12 h-px bg-gradient-to-r from-transparent to-neutral-700" />
+            <span className="text-xs tracking-[0.4em] text-neutral-500 uppercase">
+              WorkField
+            </span>
+            <div className="w-12 h-px bg-gradient-to-l from-transparent to-neutral-700" />
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -56,7 +95,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-3 text-neutral-100 text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors"
+              className="w-full bg-neutral-900/80 border border-neutral-800 rounded-lg px-4 py-3 text-neutral-100 text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-600 focus:bg-neutral-900 transition-all"
               placeholder="nome@azienda.com"
               required
             />
@@ -71,7 +110,7 @@ export default function LoginPage() {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-3 text-neutral-100 text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-700 transition-colors pr-12"
+                className="w-full bg-neutral-900/80 border border-neutral-800 rounded-lg px-4 py-3 text-neutral-100 text-sm placeholder-neutral-600 focus:outline-none focus:border-neutral-600 focus:bg-neutral-900 transition-all pr-16"
                 placeholder="••••••••"
                 required
               />
@@ -94,7 +133,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-neutral-100 text-neutral-900 font-medium py-3 rounded-lg hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="w-full bg-neutral-100 text-neutral-900 font-medium py-3 rounded-lg hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm mt-2"
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
@@ -107,10 +146,24 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-8 text-center text-neutral-600 text-xs">
+        <p className="mt-10 text-center text-neutral-700 text-xs">
           Contatta l'amministratore per l'accesso
         </p>
       </div>
+
+      {/* CSS Animation */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
