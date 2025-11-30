@@ -3,23 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import {
-  Users,
-  Plus,
-  Copy,
-  Check,
-  RefreshCw,
-  Crown,
-  UserPlus,
-  Building2,
-} from 'lucide-react';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
-import Card from '@/components/ui/Card';
-import Modal from '@/components/ui/Modal';
-import Avatar from '@/components/ui/Avatar';
-import Badge from '@/components/ui/Badge';
 import type { Team, User } from '@/types';
 
 export default function TeamPage() {
@@ -55,41 +38,26 @@ export default function TeamPage() {
 
   const handleCreateTeam = async () => {
     if (!newTeamName.trim()) return;
-
     setIsSubmitting(true);
     setError('');
-
     try {
       const res = await fetch('/api/teams', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newTeamName,
-          description: newTeamDescription || null,
-        }),
+        body: JSON.stringify({ name: newTeamName, description: newTeamDescription || null }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
-        setError(data.error || 'Errore nella creazione del team');
+        setError(data.error || 'Errore nella creazione');
         return;
       }
-
-      // Update session
-      await update({
-        teamId: data.id,
-        teamName: data.name,
-        teamSlug: data.slug,
-      });
-
+      await update({ teamId: data.id, teamName: data.name, teamSlug: data.slug });
       setTeam(data);
       setIsCreateModalOpen(false);
       setNewTeamName('');
       setNewTeamDescription('');
       router.refresh();
-    } catch (error) {
-      console.error('Error creating team:', error);
+    } catch {
       setError('Si è verificato un errore');
     } finally {
       setIsSubmitting(false);
@@ -98,38 +66,26 @@ export default function TeamPage() {
 
   const handleJoinTeam = async () => {
     if (!joinCode.trim()) return;
-
     setIsSubmitting(true);
     setError('');
-
     try {
       const res = await fetch('/api/teams/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inviteCode: joinCode }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.error || 'Codice non valido');
         return;
       }
-
-      // Update session
-      await update({
-        teamId: data.id,
-        teamName: data.name,
-        teamSlug: data.slug,
-      });
-
+      await update({ teamId: data.id, teamName: data.name, teamSlug: data.slug });
       setTeam(data);
       setIsJoinModalOpen(false);
       setJoinCode('');
       fetchTeam();
       router.refresh();
-    } catch (error) {
-      console.error('Error joining team:', error);
+    } catch {
       setError('Si è verificato un errore');
     } finally {
       setIsSubmitting(false);
@@ -146,10 +102,10 @@ export default function TeamPage() {
 
   if (isLoading) {
     return (
-      <div className="p-8">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-dark-200 dark:bg-dark-700 rounded w-1/4" />
-          <div className="h-64 bg-dark-200 dark:bg-dark-700 rounded-2xl" />
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-neutral-800 rounded w-1/4" />
+          <div className="h-40 bg-neutral-800 rounded-lg" />
         </div>
       </div>
     );
@@ -157,220 +113,173 @@ export default function TeamPage() {
 
   if (!team) {
     return (
-      <div className="p-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl mx-auto text-center py-20"
-        >
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-500/20 to-violet-500/20 flex items-center justify-center mx-auto mb-6">
-            <Users className="w-12 h-12 text-primary-500" />
+      <div className="p-6">
+        <div className="max-w-md mx-auto text-center py-16">
+          <h1 className="text-lg font-medium text-neutral-100 mb-2">Nessun team</h1>
+          <p className="text-sm text-neutral-500 mb-6">Crea o unisciti a un team per collaborare</p>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="px-4 py-2 bg-neutral-100 text-neutral-900 text-sm font-medium rounded-lg hover:bg-white transition-colors"
+            >
+              Crea nuovo team
+            </button>
+            <button
+              onClick={() => setIsJoinModalOpen(true)}
+              className="px-4 py-2 text-sm text-neutral-400 hover:text-neutral-200 border border-neutral-800 rounded-lg hover:bg-neutral-900 transition-colors"
+            >
+              Unisciti con codice
+            </button>
           </div>
-          <h1 className="text-3xl font-bold text-dark-900 dark:text-white mb-4">
-            Unisciti o crea un team
-          </h1>
-          <p className="text-dark-500 mb-8 max-w-md mx-auto">
-            Fai parte di un team per condividere note, gestire ticket e collaborare con i colleghi.
-          </p>
+        </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" onClick={() => setIsCreateModalOpen(true)}>
-              <Plus className="w-5 h-5" />
-              Crea un nuovo team
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => setIsJoinModalOpen(true)}>
-              <UserPlus className="w-5 h-5" />
-              Unisciti con un codice
-            </Button>
-          </div>
-        </motion.div>
-
-        {/* Create Team Modal */}
-        <Modal
-          isOpen={isCreateModalOpen}
-          onClose={() => { setIsCreateModalOpen(false); setError(''); }}
-          title="Crea un nuovo team"
-        >
-          <div className="space-y-5">
-            <Input
-              label="Nome del team"
-              placeholder="Es: Development Team"
-              value={newTeamName}
-              onChange={(e) => setNewTeamName(e.target.value)}
-              required
-            />
-            <Input
-              label="Descrizione (opzionale)"
-              placeholder="Una breve descrizione del team"
-              value={newTeamDescription}
-              onChange={(e) => setNewTeamDescription(e.target.value)}
-            />
-
-            {error && (
-              <p className="text-red-500 text-sm">{error}</p>
-            )}
-
-            <div className="flex justify-end gap-3">
-              <Button variant="secondary" onClick={() => { setIsCreateModalOpen(false); setError(''); }}>
-                Annulla
-              </Button>
-              <Button
-                onClick={handleCreateTeam}
-                isLoading={isSubmitting}
-                disabled={!newTeamName.trim()}
-              >
-                Crea Team
-              </Button>
+        {/* Create Modal */}
+        {isCreateModalOpen && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+            <div className="bg-neutral-900 border border-neutral-800 rounded-lg w-full max-w-sm">
+              <div className="p-4 border-b border-neutral-800">
+                <h2 className="text-sm font-medium text-neutral-100">Crea team</h2>
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className="block text-xs text-neutral-500 uppercase tracking-wider mb-1.5">Nome</label>
+                  <input
+                    type="text"
+                    value={newTeamName}
+                    onChange={(e) => setNewTeamName(e.target.value)}
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-700"
+                    placeholder="Nome del team"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-neutral-500 uppercase tracking-wider mb-1.5">Descrizione</label>
+                  <input
+                    type="text"
+                    value={newTeamDescription}
+                    onChange={(e) => setNewTeamDescription(e.target.value)}
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-700"
+                    placeholder="Opzionale"
+                  />
+                </div>
+                {error && <p className="text-red-400 text-sm">{error}</p>}
+              </div>
+              <div className="p-4 border-t border-neutral-800 flex justify-end gap-3">
+                <button
+                  onClick={() => { setIsCreateModalOpen(false); setError(''); }}
+                  className="px-4 py-2 text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={handleCreateTeam}
+                  disabled={!newTeamName.trim() || isSubmitting}
+                  className="px-4 py-2 bg-neutral-100 text-neutral-900 text-sm font-medium rounded-lg hover:bg-white transition-colors disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Creazione...' : 'Crea'}
+                </button>
+              </div>
             </div>
           </div>
-        </Modal>
+        )}
 
-        {/* Join Team Modal */}
-        <Modal
-          isOpen={isJoinModalOpen}
-          onClose={() => { setIsJoinModalOpen(false); setError(''); }}
-          title="Unisciti a un team"
-        >
-          <div className="space-y-5">
-            <p className="text-dark-500">
-              Inserisci il codice di invito che ti è stato fornito dal tuo team.
-            </p>
-            <Input
-              label="Codice di invito"
-              placeholder="Es: ABC123XY"
-              value={joinCode}
-              onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-              required
-            />
-
-            {error && (
-              <p className="text-red-500 text-sm">{error}</p>
-            )}
-
-            <div className="flex justify-end gap-3">
-              <Button variant="secondary" onClick={() => { setIsJoinModalOpen(false); setError(''); }}>
-                Annulla
-              </Button>
-              <Button
-                onClick={handleJoinTeam}
-                isLoading={isSubmitting}
-                disabled={!joinCode.trim()}
-              >
-                Unisciti
-              </Button>
+        {/* Join Modal */}
+        {isJoinModalOpen && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+            <div className="bg-neutral-900 border border-neutral-800 rounded-lg w-full max-w-sm">
+              <div className="p-4 border-b border-neutral-800">
+                <h2 className="text-sm font-medium text-neutral-100">Unisciti a un team</h2>
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <label className="block text-xs text-neutral-500 uppercase tracking-wider mb-1.5">Codice invito</label>
+                  <input
+                    type="text"
+                    value={joinCode}
+                    onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-700 font-mono tracking-wider"
+                    placeholder="ABC123XY"
+                  />
+                </div>
+                {error && <p className="text-red-400 text-sm">{error}</p>}
+              </div>
+              <div className="p-4 border-t border-neutral-800 flex justify-end gap-3">
+                <button
+                  onClick={() => { setIsJoinModalOpen(false); setError(''); }}
+                  className="px-4 py-2 text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={handleJoinTeam}
+                  disabled={!joinCode.trim() || isSubmitting}
+                  className="px-4 py-2 bg-neutral-100 text-neutral-900 text-sm font-medium rounded-lg hover:bg-white transition-colors disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Accesso...' : 'Unisciti'}
+                </button>
+              </div>
             </div>
           </div>
-        </Modal>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Team Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Card className="mb-8">
-            <div className="flex flex-col md:flex-row md:items-center gap-6">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <Building2 className="w-10 h-10 text-white" />
-              </div>
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-1">
-                  {team.name}
-                </h1>
-                {team.description && (
-                  <p className="text-dark-500 mb-3">{team.description}</p>
-                )}
-                <div className="flex items-center gap-4">
-                  <Badge variant="info">
-                    <Users className="w-3 h-3 mr-1" />
-                    {team.members?.length || 1} membri
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
+    <div className="p-6">
+      <div className="max-w-2xl">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-lg font-medium text-neutral-100">{team.name}</h1>
+          {team.description && <p className="text-sm text-neutral-500 mt-0.5">{team.description}</p>}
+        </div>
 
-        {/* Invite Code Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="mb-8">
-            <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-4">
-              Codice di invito
-            </h2>
-            <p className="text-dark-500 mb-4">
-              Condividi questo codice con i colleghi per invitarli nel team.
-            </p>
+        {/* Invite Code */}
+        <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs text-neutral-500 uppercase tracking-wider">Codice invito</span>
+            <button
+              onClick={handleCopyCode}
+              className="text-xs text-neutral-400 hover:text-neutral-200 transition-colors"
+            >
+              {copied ? 'Copiato' : 'Copia'}
+            </button>
+          </div>
+          <p className="text-lg font-mono tracking-wider text-neutral-100">{team.inviteCode}</p>
+        </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex-1 bg-dark-50 dark:bg-dark-700 rounded-xl px-4 py-3 font-mono text-lg tracking-wider text-dark-900 dark:text-white">
-                {team.inviteCode}
-              </div>
-              <Button onClick={handleCopyCode} variant="secondary">
-                {copied ? (
-                  <>
-                    <Check className="w-5 h-5 text-emerald-500" />
-                    Copiato
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-5 h-5" />
-                    Copia
-                  </>
-                )}
-              </Button>
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Team Members */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card>
-            <h2 className="text-lg font-semibold text-dark-900 dark:text-white mb-6">
-              Membri del team
-            </h2>
-
-            <div className="space-y-4">
-              {team.members?.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between p-4 bg-dark-50 dark:bg-dark-700/50 rounded-xl"
-                >
-                  <div className="flex items-center gap-4">
-                    <Avatar name={member.name} size="md" />
-                    <div>
-                      <p className="font-medium text-dark-900 dark:text-white">
-                        {member.name}
-                        {member.id === session?.user?.id && (
-                          <span className="text-primary-500 ml-2">(tu)</span>
-                        )}
-                      </p>
-                      <p className="text-sm text-dark-500">{member.email}</p>
-                    </div>
+        {/* Members */}
+        <div className="bg-neutral-900 border border-neutral-800 rounded-lg">
+          <div className="p-4 border-b border-neutral-800">
+            <span className="text-xs text-neutral-500 uppercase tracking-wider">
+              Membri ({team.members?.length || 0})
+            </span>
+          </div>
+          <div className="divide-y divide-neutral-800">
+            {team.members?.map((member) => (
+              <div key={member.id} className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-sm text-neutral-400">
+                    {member.name.charAt(0).toUpperCase()}
                   </div>
-                  {member.role === 'admin' && (
-                    <Badge variant="warning">
-                      <Crown className="w-3 h-3 mr-1" />
-                      Admin
-                    </Badge>
-                  )}
+                  <div>
+                    <p className="text-sm text-neutral-200">
+                      {member.name}
+                      {member.id === session?.user?.id && (
+                        <span className="text-neutral-500 ml-1">(tu)</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-neutral-500">{member.email}</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </Card>
-        </motion.div>
+                {member.role === 'admin' && (
+                  <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-amber-950 text-amber-400">
+                    Admin
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

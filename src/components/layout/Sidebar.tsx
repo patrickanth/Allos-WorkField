@@ -4,54 +4,14 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Sparkles,
-  FileText,
-  Users,
-  LayoutGrid,
-  Download,
-  Settings,
-  LogOut,
-  ChevronLeft,
-  Lock,
-  Globe,
-} from 'lucide-react';
-import Avatar from '@/components/ui/Avatar';
 
 const navItems = [
-  {
-    name: 'Le mie Note',
-    href: '/notes',
-    icon: FileText,
-    badge: 'private',
-  },
-  {
-    name: 'Note Team',
-    href: '/notes?view=shared',
-    icon: Globe,
-    badge: 'shared',
-  },
-  {
-    name: 'Tickets',
-    href: '/tickets',
-    icon: LayoutGrid,
-  },
-  {
-    name: 'Team',
-    href: '/team',
-    icon: Users,
-  },
-  {
-    name: 'Download Agent',
-    href: '/download',
-    icon: Download,
-  },
-  {
-    name: 'Impostazioni',
-    href: '/settings',
-    icon: Settings,
-  },
+  { name: 'Note', href: '/notes' },
+  { name: 'Note Team', href: '/notes?view=shared' },
+  { name: 'Tickets', href: '/tickets' },
+  { name: 'Team', href: '/team' },
+  { name: 'Agent', href: '/download' },
+  { name: 'Impostazioni', href: '/settings' },
 ];
 
 export default function Sidebar() {
@@ -67,77 +27,45 @@ export default function Sidebar() {
   };
 
   return (
-    <motion.aside
-      initial={false}
-      animate={{ width: collapsed ? 80 : 280 }}
-      transition={{ duration: 0.3 }}
-      className="h-screen sticky top-0 flex flex-col bg-white dark:bg-dark-800 border-r border-dark-100 dark:border-dark-700"
-    >
+    <aside className={`h-screen sticky top-0 flex flex-col bg-neutral-950 border-r border-neutral-900 transition-all duration-300 ${collapsed ? 'w-16' : 'w-56'}`}>
       {/* Header */}
-      <div className="p-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                className="font-bold text-dark-900 dark:text-white whitespace-nowrap overflow-hidden"
-              >
-                Allos <span className="text-primary-500">WorkField</span>
-              </motion.span>
-            )}
-          </AnimatePresence>
+      <div className="p-4 flex items-center justify-between border-b border-neutral-900">
+        <Link href="/notes" className="flex items-center gap-2">
+          {!collapsed && (
+            <span className="text-sm font-medium text-neutral-200 tracking-wide">
+              WorkField
+            </span>
+          )}
+          {collapsed && (
+            <span className="text-sm font-medium text-neutral-200">W</span>
+          )}
         </Link>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 rounded-lg hover:bg-dark-100 dark:hover:bg-dark-700 transition-colors"
+          className="p-1.5 rounded hover:bg-neutral-900 transition-colors text-neutral-500"
         >
-          <ChevronLeft className={`w-5 h-5 text-dark-400 transition-transform ${collapsed ? 'rotate-180' : ''}`} />
+          <svg className={`w-4 h-4 transition-transform ${collapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200
-                ${active
-                  ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400'
-                  : 'text-dark-600 dark:text-dark-300 hover:bg-dark-100 dark:hover:bg-dark-700'
-                }
-              `}
+              className={`flex items-center px-3 py-2 rounded-md text-sm transition-colors ${
+                active
+                  ? 'bg-neutral-900 text-neutral-100'
+                  : 'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-900/50'
+              }`}
             >
-              <item.icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-primary-500' : ''}`} />
-              <AnimatePresence>
-                {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    className="font-medium whitespace-nowrap overflow-hidden"
-                  >
-                    {item.name}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-              {!collapsed && item.badge && (
-                <span className={`ml-auto px-2 py-0.5 rounded-full text-xs font-medium ${
-                  item.badge === 'private'
-                    ? 'bg-dark-100 dark:bg-dark-700 text-dark-500'
-                    : 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
-                }`}>
-                  {item.badge === 'private' ? <Lock className="w-3 h-3" /> : <Globe className="w-3 h-3" />}
-                </span>
-              )}
+              {!collapsed && <span>{item.name}</span>}
+              {collapsed && <span>{item.name.charAt(0)}</span>}
             </Link>
           );
         })}
@@ -145,38 +73,32 @@ export default function Sidebar() {
 
       {/* User section */}
       {session?.user && (
-        <div className="p-3 border-t border-dark-100 dark:border-dark-700">
-          <div className={`flex items-center gap-3 p-3 rounded-xl bg-dark-50 dark:bg-dark-700/50 ${collapsed ? 'justify-center' : ''}`}>
-            <Avatar name={session.user.name || ''} size="sm" />
-            <AnimatePresence>
-              {!collapsed && (
-                <motion.div
-                  initial={{ opacity: 0, width: 0 }}
-                  animate={{ opacity: 1, width: 'auto' }}
-                  exit={{ opacity: 0, width: 0 }}
-                  className="flex-1 min-w-0 overflow-hidden"
-                >
-                  <p className="font-medium text-sm text-dark-900 dark:text-white truncate">
+        <div className="p-3 border-t border-neutral-900">
+          <div className={`flex items-center gap-2 ${collapsed ? 'justify-center' : ''}`}>
+            <div className="w-7 h-7 rounded-full bg-neutral-800 flex items-center justify-center text-xs text-neutral-400 font-medium">
+              {session.user.name?.charAt(0).toUpperCase()}
+            </div>
+            {!collapsed && (
+              <>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-neutral-300 truncate">
                     {session.user.name}
                   </p>
-                  <p className="text-xs text-dark-500 truncate">
-                    {session.user.teamName || 'Nessun team'}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            {!collapsed && (
-              <button
-                onClick={() => signOut({ callbackUrl: '/' })}
-                className="p-2 rounded-lg hover:bg-dark-200 dark:hover:bg-dark-600 transition-colors"
-                title="Logout"
-              >
-                <LogOut className="w-4 h-4 text-dark-400" />
-              </button>
+                </div>
+                <button
+                  onClick={() => signOut({ callbackUrl: '/login' })}
+                  className="p-1.5 rounded hover:bg-neutral-900 transition-colors text-neutral-600 hover:text-neutral-400"
+                  title="Esci"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                </button>
+              </>
             )}
           </div>
         </div>
       )}
-    </motion.aside>
+    </aside>
   );
 }

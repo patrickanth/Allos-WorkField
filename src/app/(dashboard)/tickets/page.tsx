@@ -2,33 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
-import {
-  Plus,
-  Search,
-  Download,
-  Filter,
-  MoreHorizontal,
-  Edit3,
-  Trash2,
-  Clock,
-  AlertCircle,
-  CheckCircle2,
-  Circle,
-  Loader2,
-  Settings,
-  Columns3,
-  LayoutGrid,
-} from 'lucide-react';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
-import Select from '@/components/ui/Select';
-import Modal from '@/components/ui/Modal';
-import Textarea from '@/components/ui/Textarea';
-import Badge from '@/components/ui/Badge';
-import Avatar from '@/components/ui/Avatar';
 import type { Ticket, TableColumn } from '@/types';
 
 const statusOptions = [
@@ -45,23 +20,16 @@ const priorityOptions = [
   { value: 'critical', label: 'Critica' },
 ];
 
-const statusIcons: Record<string, React.ReactNode> = {
-  open: <Circle className="w-4 h-4 text-blue-500" />,
-  in_progress: <Loader2 className="w-4 h-4 text-amber-500 animate-spin" />,
-  resolved: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
-  closed: <CheckCircle2 className="w-4 h-4 text-dark-400" />,
-};
-
 const priorityColors: Record<string, string> = {
-  low: 'bg-dark-100 dark:bg-dark-700 text-dark-600 dark:text-dark-300',
-  medium: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
-  high: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
-  critical: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+  low: 'bg-neutral-800 text-neutral-400',
+  medium: 'bg-blue-950 text-blue-400',
+  high: 'bg-amber-950 text-amber-400',
+  critical: 'bg-red-950 text-red-400',
 };
 
 export default function TicketsPage() {
   const { data: session } = useSession();
-  const [tickets, setTickets] = useState<(Ticket & { author?: { id: string; name: string; avatar: string | null }; assignee?: { id: string; name: string; avatar: string | null } | null })[]>([]);
+  const [tickets, setTickets] = useState<(Ticket & { author?: { id: string; name: string; avatar: string | null } })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -73,7 +41,6 @@ export default function TicketsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tableConfig, setTableConfig] = useState<{ columns: TableColumn[] } | null>(null);
 
-  // Form state
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -82,7 +49,6 @@ export default function TicketsPage() {
     resolutionTime: '',
   });
 
-  // Column config state
   const [newColumnName, setNewColumnName] = useState('');
   const [newColumnType, setNewColumnType] = useState<'text' | 'number' | 'select'>('text');
 
@@ -98,9 +64,7 @@ export default function TicketsPage() {
     try {
       const res = await fetch('/api/tickets');
       const data = await res.json();
-      if (Array.isArray(data)) {
-        setTickets(data);
-      }
+      if (Array.isArray(data)) setTickets(data);
     } catch (error) {
       console.error('Error fetching tickets:', error);
     } finally {
@@ -112,9 +76,7 @@ export default function TicketsPage() {
     try {
       const res = await fetch('/api/table-config');
       const data = await res.json();
-      if (data?.columns) {
-        setTableConfig(data);
-      }
+      if (data?.columns) setTableConfig(data);
     } catch (error) {
       console.error('Error fetching table config:', error);
     }
@@ -122,7 +84,6 @@ export default function TicketsPage() {
 
   const handleCreateTicket = async () => {
     if (!formData.name.trim()) return;
-
     setIsSubmitting(true);
     try {
       const res = await fetch('/api/tickets', {
@@ -136,7 +97,6 @@ export default function TicketsPage() {
           resolutionTime: formData.resolutionTime ? parseInt(formData.resolutionTime) : null,
         }),
       });
-
       if (res.ok) {
         const newTicket = await res.json();
         setTickets([newTicket, ...tickets]);
@@ -152,7 +112,6 @@ export default function TicketsPage() {
 
   const handleUpdateTicket = async () => {
     if (!editingTicket) return;
-
     setIsSubmitting(true);
     try {
       const res = await fetch(`/api/tickets/${editingTicket.id}`, {
@@ -166,7 +125,6 @@ export default function TicketsPage() {
           resolutionTime: formData.resolutionTime ? parseInt(formData.resolutionTime) : null,
         }),
       });
-
       if (res.ok) {
         const updatedTicket = await res.json();
         setTickets(tickets.map(t => t.id === updatedTicket.id ? updatedTicket : t));
@@ -187,7 +145,6 @@ export default function TicketsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       });
-
       if (res.ok) {
         const updatedTicket = await res.json();
         setTickets(tickets.map(t => t.id === updatedTicket.id ? updatedTicket : t));
@@ -198,13 +155,10 @@ export default function TicketsPage() {
   };
 
   const handleDeleteTicket = async (id: string) => {
-    if (!confirm('Sei sicuro di voler eliminare questo ticket?')) return;
-
+    if (!confirm('Eliminare questo ticket?')) return;
     try {
       const res = await fetch(`/api/tickets/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        setTickets(tickets.filter(t => t.id !== id));
-      }
+      if (res.ok) setTickets(tickets.filter(t => t.id !== id));
     } catch (error) {
       console.error('Error deleting ticket:', error);
     }
@@ -230,23 +184,19 @@ export default function TicketsPage() {
 
   const handleAddColumn = async () => {
     if (!newColumnName.trim() || !tableConfig) return;
-
     const newColumn: TableColumn = {
       id: crypto.randomUUID(),
       name: newColumnName,
       type: newColumnType,
       required: false,
     };
-
     const updatedColumns = [...tableConfig.columns, newColumn];
-
     try {
       const res = await fetch('/api/table-config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ columns: updatedColumns }),
       });
-
       if (res.ok) {
         const data = await res.json();
         setTableConfig(data);
@@ -259,16 +209,13 @@ export default function TicketsPage() {
 
   const handleRemoveColumn = async (columnId: string) => {
     if (!tableConfig) return;
-
     const updatedColumns = tableConfig.columns.filter(c => c.id !== columnId);
-
     try {
       const res = await fetch('/api/table-config', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ columns: updatedColumns }),
       });
-
       if (res.ok) {
         const data = await res.json();
         setTableConfig(data);
@@ -279,13 +226,7 @@ export default function TicketsPage() {
   };
 
   const resetForm = () => {
-    setFormData({
-      name: '',
-      description: '',
-      priority: 'medium',
-      reactionTime: '',
-      resolutionTime: '',
-    });
+    setFormData({ name: '', description: '', priority: 'medium', reactionTime: '', resolutionTime: '' });
     setEditingTicket(null);
   };
 
@@ -312,383 +253,330 @@ export default function TicketsPage() {
 
   if (!session?.user?.teamId) {
     return (
-      <div className="p-8 flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="w-20 h-20 rounded-full bg-dark-100 dark:bg-dark-800 flex items-center justify-center mb-4">
-          <AlertCircle className="w-10 h-10 text-dark-400" />
-        </div>
-        <h2 className="text-xl font-semibold text-dark-900 dark:text-white mb-2">
-          Nessun team
-        </h2>
-        <p className="text-dark-500 text-center max-w-md">
-          Devi far parte di un team per vedere e gestire i ticket.
-          Vai nella sezione Team per creare o unirti a un team.
-        </p>
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <p className="text-neutral-500 text-sm mb-2">Nessun team</p>
+        <p className="text-neutral-600 text-xs">Unisciti a un team per gestire i ticket</p>
       </div>
     );
   }
 
-  return (
-    <div className="p-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-dark-900 dark:text-white">
-            Tickets
-          </h1>
-          <p className="text-dark-500 mt-1">
-            Gestisci i ticket del tuo team
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="secondary" onClick={() => setIsConfigModalOpen(true)}>
-            <Columns3 className="w-5 h-5" />
-            Configura Colonne
-          </Button>
-          <Button variant="secondary" onClick={handleExport}>
-            <Download className="w-5 h-5" />
-            Esporta Excel
-          </Button>
-          <Button onClick={() => { resetForm(); setIsModalOpen(true); }}>
-            <Plus className="w-5 h-5" />
-            Nuovo Ticket
-          </Button>
-        </div>
-      </div>
+  const stats = [
+    { label: 'Totale', value: tickets.length },
+    { label: 'Aperti', value: tickets.filter(t => t.status === 'open').length },
+    { label: 'In Corso', value: tickets.filter(t => t.status === 'in_progress').length },
+    { label: 'Chiusi', value: tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length },
+  ];
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="flex-1 max-w-md">
-          <Input
-            placeholder="Cerca ticket..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            leftIcon={<Search className="w-5 h-5" />}
-          />
+  return (
+    <div className="p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-lg font-medium text-neutral-100">Tickets</h1>
+          <p className="text-sm text-neutral-500 mt-0.5">Gestione ticket del team</p>
         </div>
-        <Select
-          options={[{ value: 'all', label: 'Tutti gli stati' }, ...statusOptions]}
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        />
-        <Select
-          options={[{ value: 'all', label: 'Tutte le priorità' }, ...priorityOptions]}
-          value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value)}
-        />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsConfigModalOpen(true)}
+            className="px-3 py-2 text-sm text-neutral-400 hover:text-neutral-200 border border-neutral-800 rounded-lg hover:bg-neutral-900 transition-colors"
+          >
+            Colonne
+          </button>
+          <button
+            onClick={handleExport}
+            className="px-3 py-2 text-sm text-neutral-400 hover:text-neutral-200 border border-neutral-800 rounded-lg hover:bg-neutral-900 transition-colors"
+          >
+            Esporta
+          </button>
+          <button
+            onClick={() => { resetForm(); setIsModalOpen(true); }}
+            className="px-4 py-2 bg-neutral-100 text-neutral-900 text-sm font-medium rounded-lg hover:bg-white transition-colors"
+          >
+            Nuovo ticket
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {[
-          { label: 'Totale', value: tickets.length, color: 'bg-primary-500' },
-          { label: 'Aperti', value: tickets.filter(t => t.status === 'open').length, color: 'bg-blue-500' },
-          { label: 'In Corso', value: tickets.filter(t => t.status === 'in_progress').length, color: 'bg-amber-500' },
-          { label: 'Risolti', value: tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length, color: 'bg-emerald-500' },
-        ].map((stat) => (
-          <div key={stat.label} className="bg-white dark:bg-dark-800 rounded-xl p-4 shadow-sm">
-            <p className="text-sm text-dark-500 mb-1">{stat.label}</p>
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${stat.color}`} />
-              <span className="text-2xl font-bold text-dark-900 dark:text-white">
-                {stat.value}
-              </span>
-            </div>
+      <div className="grid grid-cols-4 gap-3 mb-6">
+        {stats.map((stat) => (
+          <div key={stat.label} className="bg-neutral-900 border border-neutral-800 rounded-lg p-3">
+            <p className="text-xs text-neutral-500 mb-1">{stat.label}</p>
+            <p className="text-xl font-medium text-neutral-100">{stat.value}</p>
           </div>
         ))}
       </div>
 
+      {/* Filters */}
+      <div className="flex gap-3 mb-6">
+        <input
+          type="text"
+          placeholder="Cerca..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1 max-w-xs bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-700"
+        />
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-neutral-700"
+        >
+          <option value="all">Tutti gli stati</option>
+          {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+        </select>
+        <select
+          value={priorityFilter}
+          onChange={(e) => setPriorityFilter(e.target.value)}
+          className="bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-neutral-700"
+        >
+          <option value="all">Tutte le priorità</option>
+          {priorityOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+        </select>
+      </div>
+
       {/* Table */}
       {isLoading ? (
-        <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm animate-pulse">
-          <div className="p-4 border-b border-dark-100 dark:border-dark-700">
-            <div className="h-6 bg-dark-200 dark:bg-dark-700 rounded w-1/4" />
-          </div>
+        <div className="bg-neutral-900 border border-neutral-800 rounded-lg animate-pulse">
+          <div className="p-4 border-b border-neutral-800"><div className="h-4 bg-neutral-800 rounded w-1/4" /></div>
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="p-4 border-b border-dark-100 dark:border-dark-700">
-              <div className="h-4 bg-dark-200 dark:bg-dark-700 rounded w-3/4" />
-            </div>
+            <div key={i} className="p-4 border-b border-neutral-800"><div className="h-4 bg-neutral-800 rounded w-3/4" /></div>
           ))}
         </div>
       ) : filteredTickets.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center py-20 bg-white dark:bg-dark-800 rounded-xl"
-        >
-          <div className="w-20 h-20 rounded-full bg-dark-100 dark:bg-dark-700 flex items-center justify-center mx-auto mb-4">
-            <LayoutGrid className="w-10 h-10 text-dark-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-dark-900 dark:text-white mb-2">
-            Nessun ticket trovato
-          </h3>
-          <p className="text-dark-500 mb-6">
-            {searchQuery || statusFilter !== 'all' || priorityFilter !== 'all'
-              ? 'Prova a modificare i filtri'
-              : 'Crea il primo ticket del team'}
-          </p>
-          {!searchQuery && statusFilter === 'all' && priorityFilter === 'all' && (
-            <Button onClick={() => { resetForm(); setIsModalOpen(true); }}>
-              <Plus className="w-5 h-5" />
-              Crea il primo ticket
-            </Button>
-          )}
-        </motion.div>
+        <div className="text-center py-16 bg-neutral-900 border border-neutral-800 rounded-lg">
+          <p className="text-neutral-500 text-sm mb-4">Nessun ticket</p>
+          <button
+            onClick={() => { resetForm(); setIsModalOpen(true); }}
+            className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
+          >
+            Crea il primo ticket
+          </button>
+        </div>
       ) : (
-        <div className="bg-white dark:bg-dark-800 rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-dark-100 dark:border-dark-700">
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-dark-600 dark:text-dark-300">
-                    Nome
-                  </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-dark-600 dark:text-dark-300">
-                    Stato
-                  </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-dark-600 dark:text-dark-300">
-                    Priorità
-                  </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-dark-600 dark:text-dark-300">
-                    Tempo Reazione
-                  </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-dark-600 dark:text-dark-300">
-                    Autore
-                  </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-dark-600 dark:text-dark-300">
-                    Data
-                  </th>
-                  <th className="w-16"></th>
+                <tr className="border-b border-neutral-800">
+                  <th className="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider">Nome</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider">Stato</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider">Priorità</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider">Reazione</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider">Autore</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-neutral-500 uppercase tracking-wider">Data</th>
+                  <th className="w-12"></th>
                 </tr>
               </thead>
               <tbody>
-                <AnimatePresence mode="popLayout">
-                  {filteredTickets.map((ticket) => (
-                    <motion.tr
-                      key={ticket.id}
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="border-b border-dark-100 dark:border-dark-700 hover:bg-dark-50 dark:hover:bg-dark-700/50 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div>
-                          <p className="font-medium text-dark-900 dark:text-white">
-                            {ticket.name}
-                          </p>
-                          {ticket.description && (
-                            <p className="text-sm text-dark-500 truncate max-w-xs">
-                              {ticket.description}
-                            </p>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <select
-                          value={ticket.status}
-                          onChange={(e) => handleUpdateStatus(ticket.id, e.target.value)}
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-dark-50 dark:bg-dark-700 border-0 text-sm cursor-pointer"
+                {filteredTickets.map((ticket) => (
+                  <tr key={ticket.id} className="border-b border-neutral-800 hover:bg-neutral-800/50 transition-colors">
+                    <td className="px-4 py-3">
+                      <p className="text-sm text-neutral-200">{ticket.name}</p>
+                      {ticket.description && (
+                        <p className="text-xs text-neutral-500 truncate max-w-xs">{ticket.description}</p>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <select
+                        value={ticket.status}
+                        onChange={(e) => handleUpdateStatus(ticket.id, e.target.value)}
+                        className="bg-neutral-800 border-0 rounded px-2 py-1 text-xs text-neutral-300 focus:outline-none cursor-pointer"
+                      >
+                        {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </select>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded text-[10px] uppercase tracking-wider ${priorityColors[ticket.priority]}`}>
+                        {priorityOptions.find(p => p.value === ticket.priority)?.label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-neutral-400">
+                      {ticket.reactionTime ? `${ticket.reactionTime} min` : '-'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-xs text-neutral-400">{ticket.author?.name}</span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-neutral-500">
+                      {format(new Date(ticket.createdAt), 'd MMM yyyy', { locale: it })}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="relative">
+                        <button
+                          onClick={() => setOpenMenuId(openMenuId === ticket.id ? null : ticket.id)}
+                          className="p-1.5 rounded hover:bg-neutral-700 transition-colors text-neutral-500"
                         >
-                          {statusOptions.map(opt => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${priorityColors[ticket.priority]}`}>
-                          {priorityOptions.find(p => p.value === ticket.priority)?.label}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-dark-600 dark:text-dark-300">
-                        {ticket.reactionTime ? `${ticket.reactionTime} min` : '-'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <Avatar name={ticket.author?.name || ''} size="sm" />
-                          <span className="text-sm text-dark-600 dark:text-dark-300">
-                            {ticket.author?.name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-dark-500">
-                        {format(new Date(ticket.createdAt), 'd MMM yyyy', { locale: it })}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="relative">
-                          <button
-                            onClick={() => setOpenMenuId(openMenuId === ticket.id ? null : ticket.id)}
-                            className="p-2 rounded-lg hover:bg-dark-100 dark:hover:bg-dark-600 transition-colors"
-                          >
-                            <MoreHorizontal className="w-4 h-4 text-dark-400" />
-                          </button>
-
-                          <AnimatePresence>
-                            {openMenuId === ticket.id && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className="absolute right-0 mt-2 w-40 bg-white dark:bg-dark-800 rounded-xl shadow-xl border border-dark-100 dark:border-dark-700 py-2 z-10"
-                              >
-                                <button
-                                  onClick={() => openEditModal(ticket)}
-                                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-dark-700 dark:text-dark-200 hover:bg-dark-50 dark:hover:bg-dark-700"
-                                >
-                                  <Edit3 className="w-4 h-4" />
-                                  Modifica
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteTicket(ticket.id)}
-                                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                  Elimina
-                                </button>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                          </svg>
+                        </button>
+                        {openMenuId === ticket.id && (
+                          <div className="absolute right-0 mt-1 w-32 bg-neutral-900 border border-neutral-800 rounded-lg py-1 shadow-xl z-10">
+                            <button
+                              onClick={() => openEditModal(ticket)}
+                              className="w-full text-left px-3 py-1.5 text-sm text-neutral-300 hover:bg-neutral-800"
+                            >
+                              Modifica
+                            </button>
+                            <button
+                              onClick={() => handleDeleteTicket(ticket.id)}
+                              className="w-full text-left px-3 py-1.5 text-sm text-red-400 hover:bg-neutral-800"
+                            >
+                              Elimina
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
       )}
 
-      {/* Create/Edit Ticket Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => { setIsModalOpen(false); resetForm(); }}
-        title={editingTicket ? 'Modifica Ticket' : 'Nuovo Ticket'}
-        size="lg"
-      >
-        <div className="space-y-5">
-          <Input
-            label="Nome Ticket"
-            placeholder="Es: Bug nella pagina login"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
-          />
-
-          <Textarea
-            label="Descrizione"
-            placeholder="Descrivi il problema o la richiesta..."
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            rows={3}
-          />
-
-          <Select
-            label="Priorità"
-            options={priorityOptions}
-            value={formData.priority}
-            onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Tempo di Reazione (minuti)"
-              type="number"
-              placeholder="Es: 30"
-              value={formData.reactionTime}
-              onChange={(e) => setFormData({ ...formData, reactionTime: e.target.value })}
-            />
-            <Input
-              label="Tempo di Risoluzione (minuti)"
-              type="number"
-              placeholder="Es: 120"
-              value={formData.resolutionTime}
-              onChange={(e) => setFormData({ ...formData, resolutionTime: e.target.value })}
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button variant="secondary" onClick={() => { setIsModalOpen(false); resetForm(); }}>
-              Annulla
-            </Button>
-            <Button
-              onClick={editingTicket ? handleUpdateTicket : handleCreateTicket}
-              isLoading={isSubmitting}
-              disabled={!formData.name.trim()}
-            >
-              {editingTicket ? 'Salva Modifiche' : 'Crea Ticket'}
-            </Button>
+      {/* Create/Edit Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-lg w-full max-w-lg">
+            <div className="p-4 border-b border-neutral-800">
+              <h2 className="text-sm font-medium text-neutral-100">
+                {editingTicket ? 'Modifica ticket' : 'Nuovo ticket'}
+              </h2>
+            </div>
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="block text-xs text-neutral-500 uppercase tracking-wider mb-1.5">Nome</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-700"
+                  placeholder="Titolo del ticket"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-neutral-500 uppercase tracking-wider mb-1.5">Descrizione</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={3}
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-700 resize-none"
+                  placeholder="Descrizione..."
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-neutral-500 uppercase tracking-wider mb-1.5">Priorità</label>
+                <select
+                  value={formData.priority}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 focus:outline-none focus:border-neutral-700"
+                >
+                  {priorityOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-neutral-500 uppercase tracking-wider mb-1.5">Tempo Reazione (min)</label>
+                  <input
+                    type="number"
+                    value={formData.reactionTime}
+                    onChange={(e) => setFormData({ ...formData, reactionTime: e.target.value })}
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-700"
+                    placeholder="30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-neutral-500 uppercase tracking-wider mb-1.5">Tempo Risoluzione (min)</label>
+                  <input
+                    type="number"
+                    value={formData.resolutionTime}
+                    onChange={(e) => setFormData({ ...formData, resolutionTime: e.target.value })}
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-700"
+                    placeholder="120"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border-t border-neutral-800 flex justify-end gap-3">
+              <button
+                onClick={() => { setIsModalOpen(false); resetForm(); }}
+                className="px-4 py-2 text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={editingTicket ? handleUpdateTicket : handleCreateTicket}
+                disabled={!formData.name.trim() || isSubmitting}
+                className="px-4 py-2 bg-neutral-100 text-neutral-900 text-sm font-medium rounded-lg hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'Salvataggio...' : (editingTicket ? 'Salva' : 'Crea')}
+              </button>
+            </div>
           </div>
         </div>
-      </Modal>
+      )}
 
       {/* Column Config Modal */}
-      <Modal
-        isOpen={isConfigModalOpen}
-        onClose={() => setIsConfigModalOpen(false)}
-        title="Configura Colonne"
-        size="lg"
-      >
-        <div className="space-y-6">
-          <p className="text-dark-500">
-            Aggiungi o rimuovi colonne personalizzate dalla tabella dei ticket.
-          </p>
-
-          {/* Current columns */}
-          <div className="space-y-2">
-            <h4 className="font-medium text-dark-900 dark:text-white">Colonne attuali</h4>
-            <div className="space-y-2">
-              {tableConfig?.columns.map((col) => (
-                <div
-                  key={col.id}
-                  className="flex items-center justify-between p-3 bg-dark-50 dark:bg-dark-700 rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-dark-900 dark:text-white">{col.name}</span>
-                    <Badge variant="default" size="sm">{col.type}</Badge>
+      {isConfigModalOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-lg w-full max-w-lg">
+            <div className="p-4 border-b border-neutral-800">
+              <h2 className="text-sm font-medium text-neutral-100">Configura colonne</h2>
+            </div>
+            <div className="p-4 space-y-4">
+              <div className="space-y-2">
+                {tableConfig?.columns.map((col) => (
+                  <div key={col.id} className="flex items-center justify-between p-2 bg-neutral-800 rounded-lg">
+                    <span className="text-sm text-neutral-300">{col.name}</span>
+                    <button
+                      onClick={() => handleRemoveColumn(col.id)}
+                      className="p-1 text-neutral-500 hover:text-red-400 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleRemoveColumn(col.id)}
-                    className="p-1.5 rounded-lg hover:bg-dark-200 dark:hover:bg-dark-600 transition-colors text-dark-400 hover:text-red-500"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newColumnName}
+                  onChange={(e) => setNewColumnName(e.target.value)}
+                  placeholder="Nome colonna"
+                  className="flex-1 bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-700"
+                />
+                <select
+                  value={newColumnType}
+                  onChange={(e) => setNewColumnType(e.target.value as 'text' | 'number' | 'select')}
+                  className="bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-neutral-700"
+                >
+                  <option value="text">Testo</option>
+                  <option value="number">Numero</option>
+                  <option value="select">Selezione</option>
+                </select>
+                <button
+                  onClick={handleAddColumn}
+                  disabled={!newColumnName.trim()}
+                  className="px-3 py-2 bg-neutral-100 text-neutral-900 text-sm font-medium rounded-lg hover:bg-white transition-colors disabled:opacity-50"
+                >
+                  Aggiungi
+                </button>
+              </div>
             </div>
-          </div>
-
-          {/* Add new column */}
-          <div className="space-y-3 p-4 bg-dark-50 dark:bg-dark-700/50 rounded-xl">
-            <h4 className="font-medium text-dark-900 dark:text-white">Aggiungi nuova colonna</h4>
-            <div className="flex gap-3">
-              <Input
-                placeholder="Nome colonna"
-                value={newColumnName}
-                onChange={(e) => setNewColumnName(e.target.value)}
-                className="flex-1"
-              />
-              <Select
-                options={[
-                  { value: 'text', label: 'Testo' },
-                  { value: 'number', label: 'Numero' },
-                  { value: 'select', label: 'Selezione' },
-                ]}
-                value={newColumnType}
-                onChange={(e) => setNewColumnType(e.target.value as 'text' | 'number' | 'select')}
-              />
-              <Button onClick={handleAddColumn} disabled={!newColumnName.trim()}>
-                <Plus className="w-5 h-5" />
-              </Button>
+            <div className="p-4 border-t border-neutral-800 flex justify-end">
+              <button
+                onClick={() => setIsConfigModalOpen(false)}
+                className="px-4 py-2 text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
+              >
+                Chiudi
+              </button>
             </div>
-          </div>
-
-          <div className="flex justify-end">
-            <Button variant="secondary" onClick={() => setIsConfigModalOpen(false)}>
-              Chiudi
-            </Button>
           </div>
         </div>
-      </Modal>
+      )}
     </div>
   );
 }
