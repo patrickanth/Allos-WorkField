@@ -140,7 +140,7 @@ export default function NotesPage() {
   return (
     <div className="page">
       {/* Header */}
-      <div className="page-header flex items-start justify-between">
+      <div className="page-header flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h1 className="page-title">{view === 'private' ? 'Note Private' : 'Note del Team'}</h1>
           <p className="page-subtitle">
@@ -152,11 +152,12 @@ export default function NotesPage() {
             }
           </p>
         </div>
-        <button onClick={openCreateModal} className="btn btn-primary">
+        <button onClick={openCreateModal} className="btn btn-primary shrink-0 self-start">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Nuova nota
+          <span className="hidden sm:inline">Nuova nota</span>
+          <span className="sm:hidden">Nuova</span>
         </button>
       </div>
 
@@ -211,12 +212,12 @@ export default function NotesPage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {filteredNotes.map((note) => (
-            <div key={note.id} className="card p-7 group">
+            <div key={note.id} className="card p-6 sm:p-7 group overflow-visible">
               {/* Header */}
-              <div className="flex items-start justify-between mb-5">
-                <span className={`badge ${note.isPrivate ? 'badge-purple' : 'badge-green'}`}>
+              <div className="flex items-start justify-between gap-4 mb-5">
+                <span className={`badge ${note.isPrivate ? 'badge-purple' : 'badge-green'} shrink-0`}>
                   {note.isPrivate ? (
                     <>
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -234,7 +235,7 @@ export default function NotesPage() {
                   )}
                 </span>
                 {note.authorId === session?.user?.id && (
-                  <div className="relative">
+                  <div className="relative shrink-0">
                     <button
                       onClick={() => setOpenMenuId(openMenuId === note.id ? null : note.id)}
                       className="p-2 rounded-xl text-zinc-500 hover:text-white hover:bg-white/[0.06] opacity-0 group-hover:opacity-100 transition-all"
@@ -283,14 +284,14 @@ export default function NotesPage() {
               </p>
 
               {/* Footer */}
-              <div className="flex items-center justify-between pt-5 border-t border-white/[0.06]">
-                <div className="flex items-center gap-3">
-                  <div className="avatar w-8 h-8 rounded-lg text-[12px]">
+              <div className="flex items-center justify-between gap-4 pt-5 border-t border-white/[0.06]">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="avatar w-8 h-8 rounded-lg text-[12px] shrink-0">
                     {note.author?.name?.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-[14px] text-zinc-400 font-medium">{note.author?.name}</span>
+                  <span className="text-[14px] text-zinc-400 font-medium truncate">{note.author?.name}</span>
                 </div>
-                <span className="text-[13px] text-zinc-600">
+                <span className="text-[13px] text-zinc-600 shrink-0 whitespace-nowrap">
                   {format(new Date(note.timestamp), 'HH:mm · d MMMM', { locale: it })}
                 </span>
               </div>
