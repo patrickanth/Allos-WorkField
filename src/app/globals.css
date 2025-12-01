@@ -84,7 +84,8 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
+  border-radius: 24px;
+  padding: 32px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
@@ -125,10 +126,10 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 14px 28px;
+  padding: 16px 32px;
   font-size: 14px;
   font-weight: 600;
-  border-radius: 14px;
+  border-radius: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: none;
@@ -228,12 +229,12 @@ body {
 
 .input {
   width: 100%;
-  padding: 16px 20px;
+  padding: 18px 24px;
   font-size: 15px;
   background: rgba(24, 24, 27, 0.6);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border-radius: 16px;
   color: #fafafa;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -253,7 +254,7 @@ body {
 
 textarea.input {
   resize: vertical;
-  min-height: 140px;
+  min-height: 160px;
   line-height: 1.6;
 }
 
@@ -277,7 +278,7 @@ select.input {
   color: #71717a;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -287,11 +288,11 @@ select.input {
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
+  gap: 7px;
+  padding: 7px 16px;
   font-size: 12px;
   font-weight: 600;
-  border-radius: 10px;
+  border-radius: 12px;
   letter-spacing: 0.02em;
 }
 
@@ -385,7 +386,7 @@ select.input {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;
   max-height: 90vh;
   overflow: hidden;
   box-shadow:
@@ -407,7 +408,7 @@ select.input {
 }
 
 .modal-header {
-  padding: 28px 32px 20px;
+  padding: 32px 36px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -419,11 +420,11 @@ select.input {
 }
 
 .modal-body {
-  padding: 28px 32px;
+  padding: 32px 36px;
 }
 
 .modal-footer {
-  padding: 20px 32px 28px;
+  padding: 24px 36px 32px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   justify-content: flex-end;
@@ -459,12 +460,12 @@ select.input {
 .dropdown-item {
   display: block;
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 18px;
   font-size: 14px;
   font-weight: 500;
   color: #a1a1aa;
   text-align: left;
-  border-radius: 10px;
+  border-radius: 12px;
   transition: all 0.2s ease;
   cursor: pointer;
   border: none;
@@ -504,7 +505,7 @@ select.input {
 
 .table th {
   text-align: left;
-  padding: 18px 24px;
+  padding: 22px 28px;
   font-size: 12px;
   font-weight: 600;
   color: #71717a;
@@ -515,7 +516,7 @@ select.input {
 }
 
 .table td {
-  padding: 20px 24px;
+  padding: 24px 28px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   vertical-align: middle;
 }
@@ -534,13 +535,13 @@ select.input {
 
 .empty-state {
   text-align: center;
-  padding: 80px 32px;
+  padding: 96px 48px;
 }
 
 .empty-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 24px;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 28px;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%);
   border: 1px solid rgba(99, 102, 241, 0.2);
   border-radius: 24px;
@@ -551,15 +552,16 @@ select.input {
 }
 
 .empty-title {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 600;
   color: #d4d4d8;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .empty-text {
   font-size: 15px;
   color: #71717a;
+  line-height: 1.6;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -570,8 +572,8 @@ select.input {
   background: rgba(24, 24, 27, 0.6);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px;
-  padding: 28px;
+  border-radius: 24px;
+  padding: 32px;
   transition: all 0.3s ease;
 }
 
@@ -606,37 +608,46 @@ select.input {
    ───────────────────────────────────────────────────────────────────────────── */
 
 .page {
-  padding: 48px 64px;
-  max-width: 1400px;
+  padding: 56px 96px;
+  max-width: 1600px;
+  margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 
+@media (max-width: 1536px) {
+  .page {
+    padding: 52px 80px;
+    max-width: 1400px;
+  }
+}
+
 @media (max-width: 1280px) {
   .page {
-    padding: 40px 48px;
+    padding: 48px 64px;
+    max-width: 1200px;
   }
 }
 
 @media (max-width: 1024px) {
   .page {
-    padding: 32px 32px;
+    padding: 40px 48px;
   }
 }
 
 @media (max-width: 768px) {
   .page {
-    padding: 24px 20px;
+    padding: 32px 24px;
   }
 }
 
 .page-header {
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 
 @media (max-width: 768px) {
   .page-header {
-    margin-bottom: 32px;
+    margin-bottom: 40px;
   }
 }
 
@@ -644,7 +655,7 @@ select.input {
   font-size: 36px;
   font-weight: 700;
   color: #fafafa;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   letter-spacing: -0.03em;
 }
 
@@ -658,6 +669,7 @@ select.input {
   font-size: 16px;
   color: #71717a;
   font-weight: 400;
+  line-height: 1.6;
 }
 
 @media (max-width: 768px) {

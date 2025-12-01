@@ -222,7 +222,7 @@ export default function TicketsPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {stats.map((stat) => (
-          <div key={stat.label} className="stat-card relative overflow-hidden p-6 lg:p-8">
+          <div key={stat.label} className="stat-card relative overflow-hidden">
             <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-10 rounded-full -translate-y-1/2 translate-x-1/2`} />
             <p className="stat-label">{stat.label}</p>
             <p className="stat-value">{stat.value}</p>
