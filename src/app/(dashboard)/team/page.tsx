@@ -229,7 +229,7 @@ export default function TeamPage() {
       </div>
 
       {/* Invite Code Card */}
-      <div className="card p-8 lg:p-10 mb-8">
+      <div className="card mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
             <p className="text-[13px] text-zinc-500 uppercase tracking-wider font-semibold mb-3">Codice Invito</p>
@@ -261,8 +261,8 @@ export default function TeamPage() {
       </div>
 
       {/* Members */}
-      <div className="card overflow-hidden">
-        <div className="p-6 lg:p-8 border-b border-white/[0.06]">
+      <div className="card p-0 overflow-hidden">
+        <div className="p-8 border-b border-white/[0.06]">
           <div className="flex items-center justify-between gap-4">
             <span className="text-[13px] text-zinc-500 uppercase tracking-wider font-semibold">
               Membri del team
@@ -274,7 +274,7 @@ export default function TeamPage() {
         </div>
         <div className="divide-y divide-white/[0.04]">
           {team.members?.map((member) => (
-            <div key={member.id} className="p-6 lg:p-8 flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors">
+            <div key={member.id} className="p-8 flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors">
               <div className="flex items-center gap-4 min-w-0">
                 <div className={`avatar w-12 h-12 rounded-xl text-[15px] shrink-0 ${member.role === 'admin' ? 'avatar-glow' : ''}`}>
                   {member.name.charAt(0).toUpperCase()}

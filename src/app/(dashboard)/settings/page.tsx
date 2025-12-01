@@ -16,7 +16,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Profile */}
-      <div className="card p-8 lg:p-10 mb-8">
+      <div className="card mb-8">
         <div className="flex items-center gap-3 mb-8 pb-6 border-b border-white/[0.06]">
           <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -43,8 +43,8 @@ export default function SettingsPage() {
       </div>
 
       {/* Preferences */}
-      <div className="card overflow-hidden mb-8">
-        <div className="p-6 lg:p-8 border-b border-white/[0.06]">
+      <div className="card p-0 overflow-hidden mb-8">
+        <div className="p-8 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
             <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -53,7 +53,7 @@ export default function SettingsPage() {
           </div>
         </div>
         <div className="divide-y divide-white/[0.04]">
-          <div className="p-6 lg:p-8 flex items-center justify-between gap-6">
+          <div className="p-8 flex items-center justify-between gap-6">
             <div className="min-w-0">
               <p className="text-[15px] text-white font-medium mb-2">Tema scuro</p>
               <p className="text-[14px] text-zinc-500">Interfaccia con sfondo scuro per un comfort visivo ottimale</p>
@@ -63,7 +63,7 @@ export default function SettingsPage() {
               className={`toggle shrink-0 ${isDark ? 'active' : ''}`}
             />
           </div>
-          <div className="p-6 lg:p-8 flex items-center justify-between gap-6">
+          <div className="p-8 flex items-center justify-between gap-6">
             <div className="min-w-0">
               <p className="text-[15px] text-white font-medium mb-2">Notifiche</p>
               <p className="text-[14px] text-zinc-500">Ricevi notifiche quando ci sono aggiornamenti dal team</p>
@@ -77,8 +77,8 @@ export default function SettingsPage() {
       </div>
 
       {/* Security */}
-      <div className="card overflow-hidden mb-8">
-        <div className="p-6 lg:p-8 border-b border-white/[0.06]">
+      <div className="card p-0 overflow-hidden mb-8">
+        <div className="p-8 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
             <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -86,7 +86,7 @@ export default function SettingsPage() {
             <span className="text-[13px] text-zinc-400 uppercase tracking-wider font-semibold">Sicurezza</span>
           </div>
         </div>
-        <div className="p-6 lg:p-8 flex items-center justify-between gap-6">
+        <div className="p-8 flex items-center justify-between gap-6">
           <div className="min-w-0">
             <p className="text-[15px] text-white font-medium mb-2">Password</p>
             <p className="text-[14px] text-zinc-500">Modifica la password del tuo account</p>
@@ -101,7 +101,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Logout */}
-      <div className="card p-6 lg:p-8">
+      <div className="card">
         <div className="flex items-center justify-between gap-6">
           <div className="min-w-0">
             <p className="text-[15px] text-white font-medium mb-2">Esci dall'account</p>

@@ -72,7 +72,7 @@ export default function DownloadPage() {
       </div>
 
       {/* Preview */}
-      <div className="card p-10 mb-10">
+      <div className="card mb-10">
         <div className="relative bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl overflow-hidden h-72 border border-white/[0.06]">
           {/* Ambient glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/20 rounded-full blur-[100px]" />
@@ -111,7 +111,7 @@ export default function DownloadPage() {
       {/* Features */}
       <div className="grid grid-cols-2 gap-6 mb-10">
         {features.map((f) => (
-          <div key={f.title} className="card p-7">
+          <div key={f.title} className="card">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-5">
               {f.icon}
             </div>
@@ -122,8 +122,8 @@ export default function DownloadPage() {
       </div>
 
       {/* Downloads */}
-      <div className="card overflow-hidden mb-10">
-        <div className="p-6 border-b border-white/[0.06]">
+      <div className="card p-0 overflow-hidden mb-10">
+        <div className="p-8 border-b border-white/[0.06]">
           <div className="flex items-center gap-3">
             <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -133,7 +133,7 @@ export default function DownloadPage() {
         </div>
         <div className="divide-y divide-white/[0.04]">
           {platforms.map((platform) => (
-            <div key={platform.name} className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+            <div key={platform.name} className="p-8 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
               <div className="flex items-center gap-5">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/[0.08] flex items-center justify-center text-zinc-300 shadow-lg">
                   {icons[platform.icon]}
@@ -158,7 +158,7 @@ export default function DownloadPage() {
       </div>
 
       {/* Requirements */}
-      <div className="card p-8">
+      <div className="card">
         <div className="flex items-center gap-3 mb-6">
           <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
