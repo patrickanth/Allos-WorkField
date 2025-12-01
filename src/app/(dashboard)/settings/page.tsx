@@ -12,85 +12,108 @@ export default function SettingsPage() {
     <div className="page">
       <div className="page-header">
         <h1 className="page-title">Impostazioni</h1>
-        <p className="page-subtitle">Profilo e preferenze</p>
+        <p className="page-subtitle">Gestisci il tuo profilo e le preferenze</p>
       </div>
 
       {/* Profile */}
-      <div className="card p-6 mb-6">
-        <div className="flex items-center gap-4 mb-6 pb-6 border-b border-zinc-800">
-          <span className="text-[12px] text-zinc-500 uppercase tracking-wider font-medium">Profilo</span>
+      <div className="card p-8 mb-8">
+        <div className="flex items-center gap-3 mb-8 pb-6 border-b border-white/[0.06]">
+          <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span className="text-[13px] text-zinc-400 uppercase tracking-wider font-semibold">Profilo</span>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="avatar w-16 h-16 rounded-xl text-xl">
+        <div className="flex items-center gap-6">
+          <div className="avatar avatar-glow w-20 h-20 rounded-2xl text-2xl">
             {session?.user?.name?.charAt(0).toUpperCase()}
           </div>
           <div>
-            <p className="text-[16px] text-white font-medium mb-1">{session?.user?.name}</p>
-            <p className="text-[14px] text-zinc-500">{session?.user?.email}</p>
+            <p className="text-xl text-white font-semibold mb-2">{session?.user?.name}</p>
+            <p className="text-[15px] text-zinc-400">{session?.user?.email}</p>
+            {session?.user?.teamId && (
+              <span className="badge badge-purple mt-3">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Membro di un team
+              </span>
+            )}
           </div>
         </div>
       </div>
 
       {/* Preferences */}
-      <div className="card overflow-hidden mb-6">
-        <div className="p-6 border-b border-zinc-800">
-          <span className="text-[12px] text-zinc-500 uppercase tracking-wider font-medium">Preferenze</span>
+      <div className="card overflow-hidden mb-8">
+        <div className="p-8 border-b border-white/[0.06]">
+          <div className="flex items-center gap-3">
+            <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            <span className="text-[13px] text-zinc-400 uppercase tracking-wider font-semibold">Preferenze</span>
+          </div>
         </div>
-        <div className="divide-y divide-zinc-800">
-          <div className="p-6 flex items-center justify-between">
+        <div className="divide-y divide-white/[0.04]">
+          <div className="p-8 flex items-center justify-between">
             <div>
-              <p className="text-[14px] text-white mb-1">Tema scuro</p>
-              <p className="text-[13px] text-zinc-500">Interfaccia con sfondo scuro</p>
+              <p className="text-[15px] text-white font-medium mb-2">Tema scuro</p>
+              <p className="text-[14px] text-zinc-500">Interfaccia con sfondo scuro per un comfort visivo ottimale</p>
             </div>
             <button
               onClick={() => setIsDark(!isDark)}
-              className={`relative w-12 h-7 rounded-full transition-colors ${isDark ? 'bg-white' : 'bg-zinc-700'}`}
-            >
-              <span className={`absolute top-1 w-5 h-5 rounded-full transition-all ${isDark ? 'translate-x-6 bg-zinc-900' : 'translate-x-1 bg-zinc-400'}`} />
-            </button>
+              className={`toggle ${isDark ? 'active' : ''}`}
+            />
           </div>
-          <div className="p-6 flex items-center justify-between">
+          <div className="p-8 flex items-center justify-between">
             <div>
-              <p className="text-[14px] text-white mb-1">Notifiche</p>
-              <p className="text-[13px] text-zinc-500">Ricevi notifiche dal team</p>
+              <p className="text-[15px] text-white font-medium mb-2">Notifiche</p>
+              <p className="text-[14px] text-zinc-500">Ricevi notifiche quando ci sono aggiornamenti dal team</p>
             </div>
             <button
               onClick={() => setNotifications(!notifications)}
-              className={`relative w-12 h-7 rounded-full transition-colors ${notifications ? 'bg-white' : 'bg-zinc-700'}`}
-            >
-              <span className={`absolute top-1 w-5 h-5 rounded-full transition-all ${notifications ? 'translate-x-6 bg-zinc-900' : 'translate-x-1 bg-zinc-400'}`} />
-            </button>
+              className={`toggle ${notifications ? 'active' : ''}`}
+            />
           </div>
         </div>
       </div>
 
       {/* Security */}
-      <div className="card overflow-hidden mb-6">
-        <div className="p-6 border-b border-zinc-800">
-          <span className="text-[12px] text-zinc-500 uppercase tracking-wider font-medium">Sicurezza</span>
+      <div className="card overflow-hidden mb-8">
+        <div className="p-8 border-b border-white/[0.06]">
+          <div className="flex items-center gap-3">
+            <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span className="text-[13px] text-zinc-400 uppercase tracking-wider font-semibold">Sicurezza</span>
+          </div>
         </div>
-        <div className="p-6 flex items-center justify-between">
+        <div className="p-8 flex items-center justify-between">
           <div>
-            <p className="text-[14px] text-white mb-1">Password</p>
-            <p className="text-[13px] text-zinc-500">Modifica la password</p>
+            <p className="text-[15px] text-white font-medium mb-2">Password</p>
+            <p className="text-[14px] text-zinc-500">Modifica la password del tuo account</p>
           </div>
           <button className="btn btn-secondary">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
             Modifica
           </button>
         </div>
       </div>
 
       {/* Logout */}
-      <div className="card p-6">
+      <div className="card p-8">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[14px] text-white mb-1">Esci</p>
-            <p className="text-[13px] text-zinc-500">Disconnetti questa sessione</p>
+            <p className="text-[15px] text-white font-medium mb-2">Esci dall'account</p>
+            <p className="text-[14px] text-zinc-500">Disconnetti questa sessione dal tuo account</p>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
-            className="btn text-red-400 border-red-500/30 hover:bg-red-500/10"
+            className="btn btn-danger"
           >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
             Logout
           </button>
         </div>
