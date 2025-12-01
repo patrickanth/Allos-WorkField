@@ -8,104 +8,91 @@ export default function SettingsPage() {
   const [isDark, setIsDark] = useState(true);
   const [notifications, setNotifications] = useState(true);
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    document.documentElement.classList.toggle('dark');
-  };
-
   return (
-    <div className="min-h-screen relative">
-      <div className="px-16 py-14 max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-16 pt-6">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/30 mb-4 font-medium">
-            Account
-          </p>
-          <h1 className="text-5xl font-extralight text-white tracking-tight mb-3">Impostazioni</h1>
-          <p className="text-lg text-white/40 font-light">Profilo e preferenze</p>
-        </div>
+    <div className="page">
+      <div className="page-header">
+        <h1 className="page-title">Impostazioni</h1>
+        <p className="page-subtitle">Profilo e preferenze</p>
+      </div>
 
-        {/* Profile */}
-        <div className="elegant-card mb-10 overflow-hidden">
-          <div className="px-10 py-8 border-b border-white/[0.06]">
-            <span className="text-sm text-white/40 uppercase tracking-[0.15em] font-medium">Profilo</span>
+      {/* Profile */}
+      <div className="card p-6 mb-6">
+        <div className="flex items-center gap-4 mb-6 pb-6 border-b border-zinc-800">
+          <span className="text-[12px] text-zinc-500 uppercase tracking-wider font-medium">Profilo</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="avatar w-16 h-16 rounded-xl text-xl">
+            {session?.user?.name?.charAt(0).toUpperCase()}
           </div>
-          <div className="p-10">
-            <div className="flex items-center gap-6">
-              <div className="avatar w-20 h-20 rounded-2xl text-2xl text-white/60">
-                {session?.user?.name?.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <p className="text-xl text-white/80 font-light mb-1">{session?.user?.name}</p>
-                <p className="text-base text-white/40">{session?.user?.email}</p>
-              </div>
-            </div>
+          <div>
+            <p className="text-[16px] text-white font-medium mb-1">{session?.user?.name}</p>
+            <p className="text-[14px] text-zinc-500">{session?.user?.email}</p>
           </div>
         </div>
+      </div>
 
-        {/* Preferences */}
-        <div className="elegant-card mb-10 overflow-hidden">
-          <div className="px-10 py-8 border-b border-white/[0.06]">
-            <span className="text-sm text-white/40 uppercase tracking-[0.15em] font-medium">Preferenze</span>
-          </div>
-          <div className="divide-y divide-white/[0.04]">
-            <div className="px-10 py-8 flex items-center justify-between">
-              <div>
-                <p className="text-base text-white/80 mb-1">Tema scuro</p>
-                <p className="text-sm text-white/40">Interfaccia con sfondo scuro</p>
-              </div>
-              <button
-                onClick={toggleTheme}
-                className={`relative w-14 h-8 rounded-full transition-all duration-300 ${isDark ? 'bg-white' : 'bg-white/10'}`}
-              >
-                <span className={`absolute top-1 w-6 h-6 rounded-full transition-all duration-300 ${isDark ? 'translate-x-7 bg-black' : 'translate-x-1 bg-white/40'}`} />
-              </button>
-            </div>
-            <div className="px-10 py-8 flex items-center justify-between">
-              <div>
-                <p className="text-base text-white/80 mb-1">Notifiche</p>
-                <p className="text-sm text-white/40">Ricevi notifiche dal team</p>
-              </div>
-              <button
-                onClick={() => setNotifications(!notifications)}
-                className={`relative w-14 h-8 rounded-full transition-all duration-300 ${notifications ? 'bg-white' : 'bg-white/10'}`}
-              >
-                <span className={`absolute top-1 w-6 h-6 rounded-full transition-all duration-300 ${notifications ? 'translate-x-7 bg-black' : 'translate-x-1 bg-white/40'}`} />
-              </button>
-            </div>
-          </div>
+      {/* Preferences */}
+      <div className="card overflow-hidden mb-6">
+        <div className="p-6 border-b border-zinc-800">
+          <span className="text-[12px] text-zinc-500 uppercase tracking-wider font-medium">Preferenze</span>
         </div>
-
-        {/* Security */}
-        <div className="elegant-card mb-10 overflow-hidden">
-          <div className="px-10 py-8 border-b border-white/[0.06]">
-            <span className="text-sm text-white/40 uppercase tracking-[0.15em] font-medium">Sicurezza</span>
-          </div>
-          <div className="px-10 py-8 flex items-center justify-between">
+        <div className="divide-y divide-zinc-800">
+          <div className="p-6 flex items-center justify-between">
             <div>
-              <p className="text-base text-white/80 mb-1">Password</p>
-              <p className="text-sm text-white/40">Modifica la password</p>
-            </div>
-            <button className="premium-btn px-7 py-3.5 text-base text-white/70">
-              Modifica
-            </button>
-          </div>
-        </div>
-
-        {/* Logout */}
-        <div className="elegant-card overflow-hidden border-red-500/10">
-          <div className="px-10 py-8 flex items-center justify-between">
-            <div>
-              <p className="text-base text-white/80 mb-1">Esci</p>
-              <p className="text-sm text-white/40">Disconnetti questa sessione</p>
+              <p className="text-[14px] text-white mb-1">Tema scuro</p>
+              <p className="text-[13px] text-zinc-500">Interfaccia con sfondo scuro</p>
             </div>
             <button
-              onClick={() => signOut({ callbackUrl: '/login' })}
-              className="px-7 py-3.5 text-base text-red-400/80 hover:text-red-400 border border-red-500/20 rounded-2xl hover:bg-red-500/5 transition-all duration-300"
+              onClick={() => setIsDark(!isDark)}
+              className={`relative w-12 h-7 rounded-full transition-colors ${isDark ? 'bg-white' : 'bg-zinc-700'}`}
             >
-              Logout
+              <span className={`absolute top-1 w-5 h-5 rounded-full transition-all ${isDark ? 'translate-x-6 bg-zinc-900' : 'translate-x-1 bg-zinc-400'}`} />
             </button>
           </div>
+          <div className="p-6 flex items-center justify-between">
+            <div>
+              <p className="text-[14px] text-white mb-1">Notifiche</p>
+              <p className="text-[13px] text-zinc-500">Ricevi notifiche dal team</p>
+            </div>
+            <button
+              onClick={() => setNotifications(!notifications)}
+              className={`relative w-12 h-7 rounded-full transition-colors ${notifications ? 'bg-white' : 'bg-zinc-700'}`}
+            >
+              <span className={`absolute top-1 w-5 h-5 rounded-full transition-all ${notifications ? 'translate-x-6 bg-zinc-900' : 'translate-x-1 bg-zinc-400'}`} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Security */}
+      <div className="card overflow-hidden mb-6">
+        <div className="p-6 border-b border-zinc-800">
+          <span className="text-[12px] text-zinc-500 uppercase tracking-wider font-medium">Sicurezza</span>
+        </div>
+        <div className="p-6 flex items-center justify-between">
+          <div>
+            <p className="text-[14px] text-white mb-1">Password</p>
+            <p className="text-[13px] text-zinc-500">Modifica la password</p>
+          </div>
+          <button className="btn btn-secondary">
+            Modifica
+          </button>
+        </div>
+      </div>
+
+      {/* Logout */}
+      <div className="card p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[14px] text-white mb-1">Esci</p>
+            <p className="text-[13px] text-zinc-500">Disconnetti questa sessione</p>
+          </div>
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className="btn text-red-400 border-red-500/30 hover:bg-red-500/10"
+          >
+            Logout
+          </button>
         </div>
       </div>
     </div>
