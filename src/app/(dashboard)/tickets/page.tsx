@@ -14,25 +14,11 @@ const statusOptions = [
 ];
 
 const priorityOptions = [
-  { value: 'low', label: 'Bassa', color: 'bg-neutral-500' },
-  { value: 'medium', label: 'Media', color: 'bg-blue-500' },
-  { value: 'high', label: 'Alta', color: 'bg-amber-500' },
-  { value: 'critical', label: 'Critica', color: 'bg-red-500' },
+  { value: 'low', label: 'Bassa', color: 'bg-neutral-400' },
+  { value: 'medium', label: 'Media', color: 'bg-blue-400' },
+  { value: 'high', label: 'Alta', color: 'bg-amber-400' },
+  { value: 'critical', label: 'Critica', color: 'bg-red-400' },
 ];
-
-const priorityStyles: Record<string, string> = {
-  low: 'bg-neutral-900 text-neutral-400 border-neutral-800',
-  medium: 'bg-blue-950/50 text-blue-400 border-blue-900/30',
-  high: 'bg-amber-950/50 text-amber-400 border-amber-900/30',
-  critical: 'bg-red-950/50 text-red-400 border-red-900/30',
-};
-
-const statusStyles: Record<string, string> = {
-  open: 'bg-blue-950/50 text-blue-400 border-blue-900/30',
-  in_progress: 'bg-amber-950/50 text-amber-400 border-amber-900/30',
-  resolved: 'bg-emerald-950/50 text-emerald-400 border-emerald-900/30',
-  closed: 'bg-neutral-900 text-neutral-500 border-neutral-800',
-};
 
 export default function TicketsPage() {
   const { data: session } = useSession();
@@ -48,6 +34,7 @@ export default function TicketsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tableConfig, setTableConfig] = useState<{ columns: TableColumn[] } | null>(null);
   const [exportLoading, setExportLoading] = useState(false);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -177,6 +164,7 @@ export default function TicketsPage() {
 
   const handleExport = async (type: 'xlsx' | 'csv') => {
     setExportLoading(true);
+    setExportMenuOpen(false);
     try {
       const res = await fetch(`/api/tickets/export${type === 'csv' ? '?format=csv' : ''}`);
       if (res.ok) {
@@ -266,326 +254,359 @@ export default function TicketsPage() {
 
   if (!session?.user?.teamId) {
     return (
-      <div className="p-8 flex flex-col items-center justify-center min-h-[70vh]">
-        <div className="w-20 h-20 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-6">
-          <svg className="w-9 h-9 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
+      <div className="min-h-screen flex flex-col items-center justify-center px-16">
+        <div className="relative mb-10">
+          <div className="w-32 h-32 rounded-full bg-white/[0.02] border border-white/[0.06] flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-white/[0.02] border border-white/[0.04] flex items-center justify-center">
+              <svg className="w-9 h-9 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+          </div>
+          <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur-3xl -z-10" />
         </div>
-        <p className="text-neutral-400 text-sm mb-2">Nessun team</p>
-        <p className="text-neutral-600 text-xs">Unisciti a un team per gestire i ticket</p>
+        <p className="text-white/50 text-xl mb-3 font-light">Nessun team</p>
+        <p className="text-white/30 text-base">Unisciti a un team per gestire i ticket</p>
       </div>
     );
   }
 
   const stats = [
-    { label: 'Totale', value: tickets.length, color: 'border-neutral-700' },
-    { label: 'Aperti', value: tickets.filter(t => t.status === 'open').length, color: 'border-blue-900/50' },
-    { label: 'In Corso', value: tickets.filter(t => t.status === 'in_progress').length, color: 'border-amber-900/50' },
-    { label: 'Completati', value: tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length, color: 'border-emerald-900/50' },
+    { label: 'Totale', value: tickets.length, style: 'status-pill priority-low' },
+    { label: 'Aperti', value: tickets.filter(t => t.status === 'open').length, style: 'status-pill status-open' },
+    { label: 'In Corso', value: tickets.filter(t => t.status === 'in_progress').length, style: 'status-pill status-progress' },
+    { label: 'Completati', value: tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length, style: 'status-pill status-resolved' },
   ];
 
   return (
-    <div className="p-8 min-h-screen">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-light text-neutral-100 tracking-wide">Tickets</h1>
-          <p className="text-sm text-neutral-500 mt-1">Gestione ticket del team</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsConfigModalOpen(true)}
-            className="group relative px-4 py-2.5 bg-neutral-900/50 border border-neutral-800 rounded-xl text-sm text-neutral-400 hover:text-neutral-200 hover:border-neutral-700 transition-all duration-300"
-          >
-            Configura
-          </button>
-          <div className="relative group">
+    <div className="min-h-screen relative">
+      {/* Main content with generous padding */}
+      <div className="px-16 py-14 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-end justify-between mb-16 pt-6">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-white/30 mb-4 font-medium">
+              Gestione Team
+            </p>
+            <h1 className="text-5xl font-extralight text-white tracking-tight mb-3">
+              Tickets
+            </h1>
+            <p className="text-lg text-white/40 font-light">
+              Gestione ticket del team
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4">
             <button
-              className="px-4 py-2.5 bg-neutral-900/50 border border-neutral-800 rounded-xl text-sm text-neutral-400 hover:text-neutral-200 hover:border-neutral-700 transition-all duration-300"
+              onClick={() => setIsConfigModalOpen(true)}
+              className="premium-btn px-7 py-4 text-base text-white/70"
             >
-              {exportLoading ? 'Esportazione...' : 'Esporta'}
+              Configura
             </button>
-            <div className="absolute right-0 mt-2 w-40 bg-neutral-900 border border-neutral-800 rounded-xl py-2 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-20">
+            <div className="relative">
               <button
-                onClick={() => handleExport('xlsx')}
-                className="w-full text-left px-4 py-2.5 text-sm text-neutral-300 hover:bg-neutral-800 transition-colors"
+                onClick={() => setExportMenuOpen(!exportMenuOpen)}
+                className="premium-btn px-7 py-4 text-base text-white/70"
               >
-                Excel (.xlsx)
+                {exportLoading ? 'Esportazione...' : 'Esporta'}
               </button>
-              <button
-                onClick={() => handleExport('csv')}
-                className="w-full text-left px-4 py-2.5 text-sm text-neutral-300 hover:bg-neutral-800 transition-colors"
-              >
-                CSV (.csv)
-              </button>
+              {exportMenuOpen && (
+                <div className="absolute right-0 mt-3 w-52 modal-content py-3 z-20">
+                  <button
+                    onClick={() => handleExport('xlsx')}
+                    className="w-full text-left px-6 py-3.5 text-base text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    Excel (.xlsx)
+                  </button>
+                  <button
+                    onClick={() => handleExport('csv')}
+                    className="w-full text-left px-6 py-3.5 text-base text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    CSV (.csv)
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-          <button
-            onClick={() => { resetForm(); setIsModalOpen(true); }}
-            className="group relative px-6 py-2.5 bg-neutral-100 text-neutral-900 text-sm font-medium rounded-xl hover:bg-white transition-all duration-300"
-          >
-            Nuovo ticket
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className={`bg-neutral-900/30 border ${stat.color} rounded-2xl p-5 hover:bg-neutral-900/50 transition-all duration-300`}
-          >
-            <p className="text-xs text-neutral-500 uppercase tracking-wider mb-2">{stat.label}</p>
-            <p className="text-3xl font-light text-neutral-100">{stat.value}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Filters */}
-      <div className="flex gap-4 mb-8">
-        <div className="relative flex-1 max-w-sm">
-          <input
-            type="text"
-            placeholder="Cerca nei ticket..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 transition-all duration-300"
-          />
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-600">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <button
+              onClick={() => { resetForm(); setIsModalOpen(true); }}
+              className="primary-btn px-10 py-4 text-base"
+            >
+              Nuovo ticket
+            </button>
           </div>
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-300 focus:outline-none focus:border-neutral-600 transition-all duration-300 cursor-pointer"
-        >
-          <option value="all">Tutti gli stati</option>
-          {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-        </select>
-        <select
-          value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value)}
-          className="bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-300 focus:outline-none focus:border-neutral-600 transition-all duration-300 cursor-pointer"
-        >
-          <option value="all">Tutte le priorità</option>
-          {priorityOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-        </select>
-      </div>
 
-      {/* Table */}
-      {isLoading ? (
-        <div className="bg-neutral-900/30 border border-neutral-800 rounded-2xl overflow-hidden">
-          <div className="p-5 border-b border-neutral-800">
-            <div className="h-4 bg-neutral-800 rounded w-1/4 animate-pulse" />
-          </div>
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="p-5 border-b border-neutral-800">
-              <div className="h-4 bg-neutral-800 rounded w-3/4 animate-pulse" />
+        {/* Stats */}
+        <div className="grid grid-cols-4 gap-6 mb-14">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="elegant-card p-8 hover:scale-[1.02] transition-all duration-500"
+            >
+              <p className="text-sm text-white/40 uppercase tracking-wider mb-4 font-medium">{stat.label}</p>
+              <p className="text-5xl font-extralight text-white">{stat.value}</p>
             </div>
           ))}
         </div>
-      ) : filteredTickets.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 bg-neutral-900/30 border border-neutral-800 rounded-2xl">
-          <div className="w-16 h-16 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-6">
-            <svg className="w-7 h-7 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
+
+        {/* Filters */}
+        <div className="flex gap-5 mb-10">
+          <div className="relative flex-1 max-w-lg">
+            <input
+              type="text"
+              placeholder="Cerca nei ticket..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="elegant-input w-full px-7 py-5 text-base text-white"
+            />
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 text-white/25">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
           </div>
-          <p className="text-neutral-500 text-sm mb-2">Nessun ticket</p>
-          <button
-            onClick={() => { resetForm(); setIsModalOpen(true); }}
-            className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors mt-2"
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="elegant-input px-6 py-5 text-base text-white/70 cursor-pointer min-w-[180px]"
           >
-            Crea il primo ticket
-          </button>
+            <option value="all">Tutti gli stati</option>
+            {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+          </select>
+          <select
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+            className="elegant-input px-6 py-5 text-base text-white/70 cursor-pointer min-w-[180px]"
+          >
+            <option value="all">Tutte le priorità</option>
+            {priorityOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+          </select>
         </div>
-      ) : (
-        <div className="bg-neutral-900/30 border border-neutral-800 rounded-2xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-neutral-800">
-                  <th className="text-left px-6 py-4 text-[10px] font-medium text-neutral-500 uppercase tracking-widest">Ticket</th>
-                  <th className="text-left px-6 py-4 text-[10px] font-medium text-neutral-500 uppercase tracking-widest">Stato</th>
-                  <th className="text-left px-6 py-4 text-[10px] font-medium text-neutral-500 uppercase tracking-widest">Priorità</th>
-                  <th className="text-left px-6 py-4 text-[10px] font-medium text-neutral-500 uppercase tracking-widest">Tempo Reazione</th>
-                  <th className="text-left px-6 py-4 text-[10px] font-medium text-neutral-500 uppercase tracking-widest">Autore</th>
-                  <th className="text-left px-6 py-4 text-[10px] font-medium text-neutral-500 uppercase tracking-widest">Data</th>
-                  <th className="w-16"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTickets.map((ticket) => (
-                  <tr
-                    key={ticket.id}
-                    className="border-b border-neutral-800/50 hover:bg-neutral-800/30 transition-all duration-300 group"
-                  >
-                    <td className="px-6 py-5">
-                      <p className="text-sm text-neutral-200 font-medium mb-0.5">{ticket.name}</p>
-                      {ticket.description && (
-                        <p className="text-xs text-neutral-500 truncate max-w-xs">{ticket.description}</p>
-                      )}
-                    </td>
-                    <td className="px-6 py-5">
-                      <select
-                        value={ticket.status}
-                        onChange={(e) => handleUpdateStatus(ticket.id, e.target.value)}
-                        className={`px-3 py-1.5 rounded-lg text-xs border ${statusStyles[ticket.status]} bg-transparent focus:outline-none cursor-pointer transition-all duration-300`}
-                      >
-                        {statusOptions.map(opt => <option key={opt.value} value={opt.value} className="bg-neutral-900">{opt.label}</option>)}
-                      </select>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border ${priorityStyles[ticket.priority]}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${priorityOptions.find(p => p.value === ticket.priority)?.color}`} />
-                        {priorityOptions.find(p => p.value === ticket.priority)?.label}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <span className="text-sm text-neutral-400">
-                        {ticket.reactionTime ? `${ticket.reactionTime} min` : '—'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-[10px] text-neutral-400">
-                          {ticket.author?.name?.charAt(0).toUpperCase()}
-                        </div>
-                        <span className="text-xs text-neutral-400">{ticket.author?.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5 text-xs text-neutral-500">
-                      {format(new Date(ticket.createdAt), 'd MMM yyyy', { locale: it })}
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="relative">
-                        <button
-                          onClick={() => setOpenMenuId(openMenuId === ticket.id ? null : ticket.id)}
-                          className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-neutral-800 transition-all duration-300 text-neutral-500"
-                        >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                          </svg>
-                        </button>
-                        {openMenuId === ticket.id && (
-                          <div className="absolute right-0 mt-2 w-40 bg-neutral-900 border border-neutral-800 rounded-xl py-2 shadow-2xl z-20">
-                            <button
-                              onClick={() => openEditModal(ticket)}
-                              className="w-full text-left px-4 py-2.5 text-sm text-neutral-300 hover:bg-neutral-800 transition-colors"
-                            >
-                              Modifica
-                            </button>
-                            <button
-                              onClick={() => handleDeleteTicket(ticket.id)}
-                              className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-neutral-800 transition-colors"
-                            >
-                              Elimina
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+        {/* Table */}
+        {isLoading ? (
+          <div className="elegant-table">
+            <div className="p-7 border-b border-white/[0.06]">
+              <div className="h-5 bg-white/5 rounded w-1/4 animate-pulse" />
+            </div>
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="p-7 border-b border-white/[0.04]">
+                <div className="h-5 bg-white/5 rounded w-3/4 animate-pulse" />
+              </div>
+            ))}
           </div>
-        </div>
-      )}
+        ) : filteredTickets.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-32 elegant-card">
+            <div className="relative mb-10">
+              <div className="w-24 h-24 rounded-full bg-white/[0.02] border border-white/[0.06] flex items-center justify-center">
+                <svg className="w-10 h-10 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+            </div>
+            <p className="text-white/50 text-xl mb-4 font-light">Nessun ticket</p>
+            <button
+              onClick={() => { resetForm(); setIsModalOpen(true); }}
+              className="text-base text-white/30 hover:text-white/60 transition-colors"
+            >
+              Crea il primo ticket
+            </button>
+          </div>
+        ) : (
+          <div className="elegant-table">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/[0.06]">
+                    <th className="text-left px-8 py-6 text-xs font-medium text-white/30 uppercase tracking-[0.15em]">Ticket</th>
+                    <th className="text-left px-8 py-6 text-xs font-medium text-white/30 uppercase tracking-[0.15em]">Stato</th>
+                    <th className="text-left px-8 py-6 text-xs font-medium text-white/30 uppercase tracking-[0.15em]">Priorità</th>
+                    <th className="text-left px-8 py-6 text-xs font-medium text-white/30 uppercase tracking-[0.15em]">Tempo Reazione</th>
+                    <th className="text-left px-8 py-6 text-xs font-medium text-white/30 uppercase tracking-[0.15em]">Autore</th>
+                    <th className="text-left px-8 py-6 text-xs font-medium text-white/30 uppercase tracking-[0.15em]">Data</th>
+                    <th className="w-20"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTickets.map((ticket) => (
+                    <tr
+                      key={ticket.id}
+                      className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-all duration-300 group"
+                    >
+                      <td className="px-8 py-6">
+                        <p className="text-base text-white/80 font-medium mb-1">{ticket.name}</p>
+                        {ticket.description && (
+                          <p className="text-sm text-white/40 truncate max-w-sm">{ticket.description}</p>
+                        )}
+                      </td>
+                      <td className="px-8 py-6">
+                        <select
+                          value={ticket.status}
+                          onChange={(e) => handleUpdateStatus(ticket.id, e.target.value)}
+                          className={`status-pill cursor-pointer ${
+                            ticket.status === 'open' ? 'status-open' :
+                            ticket.status === 'in_progress' ? 'status-progress' :
+                            ticket.status === 'resolved' ? 'status-resolved' : 'status-closed'
+                          }`}
+                        >
+                          {statusOptions.map(opt => <option key={opt.value} value={opt.value} className="bg-[#0a0a0a]">{opt.label}</option>)}
+                        </select>
+                      </td>
+                      <td className="px-8 py-6">
+                        <span className={`status-pill ${
+                          ticket.priority === 'low' ? 'priority-low' :
+                          ticket.priority === 'medium' ? 'priority-medium' :
+                          ticket.priority === 'high' ? 'priority-high' : 'priority-critical'
+                        }`}>
+                          <span className={`w-2 h-2 rounded-full ${priorityOptions.find(p => p.value === ticket.priority)?.color}`} />
+                          {priorityOptions.find(p => p.value === ticket.priority)?.label}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6">
+                        <span className="text-base text-white/50">
+                          {ticket.reactionTime ? `${ticket.reactionTime} min` : '—'}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-3">
+                          <div className="avatar w-9 h-9 rounded-xl text-sm text-white/50">
+                            {ticket.author?.name?.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="text-sm text-white/50">{ticket.author?.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6 text-sm text-white/40">
+                        {format(new Date(ticket.createdAt), 'd MMM yyyy', { locale: it })}
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="relative">
+                          <button
+                            onClick={() => setOpenMenuId(openMenuId === ticket.id ? null : ticket.id)}
+                            className="p-3 rounded-xl opacity-0 group-hover:opacity-100 hover:bg-white/5 transition-all duration-300 text-white/30 hover:text-white/60"
+                          >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                            </svg>
+                          </button>
+                          {openMenuId === ticket.id && (
+                            <div className="absolute right-0 mt-2 w-52 modal-content py-3 z-20">
+                              <button
+                                onClick={() => openEditModal(ticket)}
+                                className="w-full text-left px-6 py-3.5 text-base text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                              >
+                                Modifica
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTicket(ticket.id)}
+                                className="w-full text-left px-6 py-3.5 text-base text-red-400/80 hover:text-red-400 hover:bg-white/5 transition-colors"
+                              >
+                                Elimina
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Create/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-lg shadow-2xl">
-            <div className="p-6 border-b border-neutral-800">
-              <h2 className="text-lg font-light text-neutral-100 tracking-wide">
-                {editingTicket ? 'Modifica ticket' : 'Nuovo ticket'}
-              </h2>
-            </div>
-            <div className="p-6 space-y-5">
-              <div>
-                <label className="block text-xs text-neutral-500 uppercase tracking-widest mb-2">Nome</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 transition-all duration-300"
-                  placeholder="Titolo del ticket"
-                  autoFocus
-                />
+        <div className="fixed inset-0 modal-backdrop flex items-center justify-center p-8 z-50">
+          <div className="modal-content w-full max-w-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2" />
+
+            <div className="relative">
+              <div className="px-10 py-8 border-b border-white/[0.06]">
+                <h2 className="text-2xl font-light text-white tracking-tight">
+                  {editingTicket ? 'Modifica ticket' : 'Nuovo ticket'}
+                </h2>
               </div>
-              <div>
-                <label className="block text-xs text-neutral-500 uppercase tracking-widest mb-2">Descrizione</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 resize-none transition-all duration-300"
-                  placeholder="Descrizione opzionale..."
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-neutral-500 uppercase tracking-widest mb-2">Priorità</label>
-                <div className="flex gap-2">
-                  {priorityOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, priority: opt.value })}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm border transition-all duration-300 ${
-                        formData.priority === opt.value
-                          ? priorityStyles[opt.value]
-                          : 'bg-neutral-900 border-neutral-800 text-neutral-500 hover:border-neutral-700'
-                      }`}
-                    >
-                      <span className={`w-2 h-2 rounded-full ${opt.color}`} />
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="p-10 space-y-8">
                 <div>
-                  <label className="block text-xs text-neutral-500 uppercase tracking-widest mb-2">Tempo Reazione (min)</label>
+                  <label className="block text-sm text-white/40 uppercase tracking-[0.15em] mb-3 font-medium">Nome</label>
                   <input
-                    type="number"
-                    value={formData.reactionTime}
-                    onChange={(e) => setFormData({ ...formData, reactionTime: e.target.value })}
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 transition-all duration-300"
-                    placeholder="30"
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="elegant-input w-full px-6 py-5 text-lg"
+                    placeholder="Titolo del ticket"
+                    autoFocus
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-neutral-500 uppercase tracking-widest mb-2">Tempo Risoluzione (min)</label>
-                  <input
-                    type="number"
-                    value={formData.resolutionTime}
-                    onChange={(e) => setFormData({ ...formData, resolutionTime: e.target.value })}
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 transition-all duration-300"
-                    placeholder="120"
+                  <label className="block text-sm text-white/40 uppercase tracking-[0.15em] mb-3 font-medium">Descrizione</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={4}
+                    className="elegant-input w-full px-6 py-5 text-base resize-none"
+                    placeholder="Descrizione opzionale..."
                   />
                 </div>
+                <div>
+                  <label className="block text-sm text-white/40 uppercase tracking-[0.15em] mb-3 font-medium">Priorità</label>
+                  <div className="flex gap-3">
+                    {priorityOptions.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, priority: opt.value })}
+                        className={`flex-1 flex items-center justify-center gap-3 px-5 py-4 rounded-2xl text-base border transition-all duration-300 ${
+                          formData.priority === opt.value
+                            ? `status-pill ${opt.value === 'low' ? 'priority-low' : opt.value === 'medium' ? 'priority-medium' : opt.value === 'high' ? 'priority-high' : 'priority-critical'}`
+                            : 'bg-white/[0.02] border-white/[0.06] text-white/40 hover:border-white/15'
+                        }`}
+                      >
+                        <span className={`w-2.5 h-2.5 rounded-full ${opt.color}`} />
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm text-white/40 uppercase tracking-[0.15em] mb-3 font-medium">Tempo Reazione (min)</label>
+                    <input
+                      type="number"
+                      value={formData.reactionTime}
+                      onChange={(e) => setFormData({ ...formData, reactionTime: e.target.value })}
+                      className="elegant-input w-full px-6 py-5 text-base"
+                      placeholder="30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-white/40 uppercase tracking-[0.15em] mb-3 font-medium">Tempo Risoluzione (min)</label>
+                    <input
+                      type="number"
+                      value={formData.resolutionTime}
+                      onChange={(e) => setFormData({ ...formData, resolutionTime: e.target.value })}
+                      className="elegant-input w-full px-6 py-5 text-base"
+                      placeholder="120"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="p-6 border-t border-neutral-800 flex justify-end gap-4">
-              <button
-                onClick={() => { setIsModalOpen(false); resetForm(); }}
-                className="px-5 py-2.5 text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
-              >
-                Annulla
-              </button>
-              <button
-                onClick={editingTicket ? handleUpdateTicket : handleCreateTicket}
-                disabled={!formData.name.trim() || isSubmitting}
-                className="px-6 py-2.5 bg-neutral-100 text-neutral-900 text-sm font-medium rounded-xl hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Salvataggio...' : (editingTicket ? 'Salva' : 'Crea')}
-              </button>
+              <div className="px-10 py-8 border-t border-white/[0.06] flex justify-end gap-5">
+                <button
+                  onClick={() => { setIsModalOpen(false); resetForm(); }}
+                  className="px-8 py-4 text-base text-white/40 hover:text-white/70 transition-colors"
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={editingTicket ? handleUpdateTicket : handleCreateTicket}
+                  disabled={!formData.name.trim() || isSubmitting}
+                  className="primary-btn px-10 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Salvataggio...' : (editingTicket ? 'Salva' : 'Crea')}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -593,75 +614,79 @@ export default function TicketsPage() {
 
       {/* Column Config Modal */}
       {isConfigModalOpen && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-neutral-950 border border-neutral-800 rounded-2xl w-full max-w-lg shadow-2xl">
-            <div className="p-6 border-b border-neutral-800">
-              <h2 className="text-lg font-light text-neutral-100 tracking-wide">Configura tabella</h2>
-              <p className="text-xs text-neutral-500 mt-1">Aggiungi o rimuovi colonne personalizzate</p>
-            </div>
-            <div className="p-6 space-y-6">
-              <div className="space-y-3 max-h-60 overflow-y-auto">
-                {tableConfig?.columns.map((col) => (
-                  <div
-                    key={col.id}
-                    className="flex items-center justify-between p-4 bg-neutral-900/50 border border-neutral-800 rounded-xl group hover:border-neutral-700 transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-neutral-800 flex items-center justify-center">
-                        <span className="text-[10px] text-neutral-400 uppercase">{col.type.charAt(0)}</span>
-                      </div>
-                      <div>
-                        <span className="text-sm text-neutral-200">{col.name}</span>
-                        <span className="text-[10px] text-neutral-600 uppercase tracking-wider ml-2">{col.type}</span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveColumn(col.id)}
-                      className="p-2 text-neutral-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
-                {(!tableConfig?.columns || tableConfig.columns.length === 0) && (
-                  <p className="text-center text-neutral-600 text-sm py-8">Nessuna colonna personalizzata</p>
-                )}
+        <div className="fixed inset-0 modal-backdrop flex items-center justify-center p-8 z-50">
+          <div className="modal-content w-full max-w-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -translate-y-1/2" />
+
+            <div className="relative">
+              <div className="px-10 py-8 border-b border-white/[0.06]">
+                <h2 className="text-2xl font-light text-white tracking-tight">Configura tabella</h2>
+                <p className="text-base text-white/40 mt-2">Aggiungi o rimuovi colonne personalizzate</p>
               </div>
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  value={newColumnName}
-                  onChange={(e) => setNewColumnName(e.target.value)}
-                  placeholder="Nome colonna"
-                  className="flex-1 bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-600 focus:outline-none focus:border-neutral-600 transition-all duration-300"
-                />
-                <select
-                  value={newColumnType}
-                  onChange={(e) => setNewColumnType(e.target.value as 'text' | 'number' | 'select')}
-                  className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-300 focus:outline-none focus:border-neutral-600 cursor-pointer transition-all duration-300"
-                >
-                  <option value="text">Testo</option>
-                  <option value="number">Numero</option>
-                  <option value="select">Selezione</option>
-                </select>
+              <div className="p-10 space-y-8">
+                <div className="space-y-4 max-h-72 overflow-y-auto">
+                  {tableConfig?.columns.map((col) => (
+                    <div
+                      key={col.id}
+                      className="flex items-center justify-between p-6 elegant-card group"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="avatar w-12 h-12 rounded-xl text-sm text-white/40">
+                          {col.type.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <span className="text-base text-white/80">{col.name}</span>
+                          <span className="text-sm text-white/30 uppercase tracking-wider ml-3">{col.type}</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveColumn(col.id)}
+                        className="p-3 text-white/30 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-300"
+                      >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                  {(!tableConfig?.columns || tableConfig.columns.length === 0) && (
+                    <p className="text-center text-white/30 text-base py-12">Nessuna colonna personalizzata</p>
+                  )}
+                </div>
+                <div className="flex gap-4">
+                  <input
+                    type="text"
+                    value={newColumnName}
+                    onChange={(e) => setNewColumnName(e.target.value)}
+                    placeholder="Nome colonna"
+                    className="elegant-input flex-1 px-6 py-5 text-base"
+                  />
+                  <select
+                    value={newColumnType}
+                    onChange={(e) => setNewColumnType(e.target.value as 'text' | 'number' | 'select')}
+                    className="elegant-input px-6 py-5 text-base cursor-pointer"
+                  >
+                    <option value="text">Testo</option>
+                    <option value="number">Numero</option>
+                    <option value="select">Selezione</option>
+                  </select>
+                  <button
+                    onClick={handleAddColumn}
+                    disabled={!newColumnName.trim()}
+                    className="primary-btn px-8 py-5 text-base disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Aggiungi
+                  </button>
+                </div>
+              </div>
+              <div className="px-10 py-8 border-t border-white/[0.06] flex justify-end">
                 <button
-                  onClick={handleAddColumn}
-                  disabled={!newColumnName.trim()}
-                  className="px-5 py-3 bg-neutral-100 text-neutral-900 text-sm font-medium rounded-xl hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => setIsConfigModalOpen(false)}
+                  className="px-8 py-4 text-base text-white/40 hover:text-white/70 transition-colors"
                 >
-                  Aggiungi
+                  Chiudi
                 </button>
               </div>
-            </div>
-            <div className="p-6 border-t border-neutral-800 flex justify-end">
-              <button
-                onClick={() => setIsConfigModalOpen(false)}
-                className="px-5 py-2.5 text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
-              >
-                Chiudi
-              </button>
             </div>
           </div>
         </div>
