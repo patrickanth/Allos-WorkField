@@ -214,7 +214,7 @@ export default function NotesPage() {
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {filteredNotes.map((note) => (
-            <div key={note.id} className="card p-8 group overflow-visible">
+            <div key={note.id} className="card p-6 md:p-8 lg:p-10 group relative">
               {/* Header */}
               <div className="flex items-start justify-between gap-6 mb-6">
                 <span className={`badge ${note.isPrivate ? 'badge-purple' : 'badge-green'} shrink-0`}>

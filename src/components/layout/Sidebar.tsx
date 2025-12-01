@@ -70,9 +70,9 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-72 h-screen sticky top-0 flex flex-col bg-[#0a0a0c]/80 backdrop-blur-xl border-r border-white/[0.06]">
+    <aside className="w-80 h-screen sticky top-0 flex flex-col bg-[#0a0a0c]/80 backdrop-blur-xl border-r border-white/[0.06]">
       {/* Logo */}
-      <div className="h-20 flex items-center px-8 border-b border-white/[0.06]">
+      <div className="h-20 flex items-center px-10 border-b border-white/[0.06]">
         <Link href="/notes" className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white to-zinc-300 flex items-center justify-center shadow-lg shadow-white/10">
             <span className="text-base font-bold text-black">A</span>
@@ -85,15 +85,15 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-5 py-6 space-y-2">
-        <p className="px-4 mb-4 text-[11px] font-bold text-zinc-600 uppercase tracking-widest">Menu</p>
+      <nav className="flex-1 px-6 py-6 space-y-2">
+        <p className="px-5 mb-4 text-[11px] font-bold text-zinc-600 uppercase tracking-widest">Menu</p>
         {navigation.map((item) => {
           const active = isActive(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-4 h-12 px-4 rounded-xl text-[14px] font-medium transition-all duration-200 ${
+              className={`flex items-center gap-4 h-12 px-5 rounded-xl text-[14px] font-medium transition-all duration-200 ${
                 active
                   ? 'bg-white/[0.08] text-white shadow-lg shadow-black/20'
                   : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
@@ -107,10 +107,10 @@ export default function Sidebar() {
       </nav>
 
       {/* Settings link */}
-      <div className="px-5 pb-4 border-t border-white/[0.06] pt-4">
+      <div className="px-6 pb-4 border-t border-white/[0.06] pt-4">
         <Link
           href="/settings"
-          className={`flex items-center gap-4 h-12 px-4 rounded-xl text-[14px] font-medium transition-all duration-200 ${
+          className={`flex items-center gap-4 h-12 px-5 rounded-xl text-[14px] font-medium transition-all duration-200 ${
             pathname === '/settings'
               ? 'bg-white/[0.08] text-white shadow-lg shadow-black/20'
               : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
@@ -128,7 +128,7 @@ export default function Sidebar() {
 
       {/* User */}
       {session?.user && (
-        <div className="px-5 pb-6 border-t border-white/[0.06] pt-4">
+        <div className="px-6 pb-6 border-t border-white/[0.06] pt-4">
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
