@@ -197,31 +197,32 @@ export default function TicketsPage() {
   return (
     <div className="page">
       {/* Header */}
-      <div className="page-header flex items-start justify-between">
+      <div className="page-header flex flex-col lg:flex-row lg:items-start justify-between gap-6">
         <div>
           <h1 className="page-title">Tickets</h1>
           <p className="page-subtitle">Gestione e monitoraggio dei ticket del team</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 shrink-0">
           <button onClick={() => handleExport('xlsx')} className="btn btn-secondary">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Esporta
+            <span className="hidden sm:inline">Esporta</span>
           </button>
           <button onClick={() => { resetForm(); setIsModalOpen(true); }} className="btn btn-primary">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Nuovo ticket
+            <span className="hidden sm:inline">Nuovo ticket</span>
+            <span className="sm:hidden">Nuovo</span>
           </button>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {stats.map((stat) => (
-          <div key={stat.label} className="stat-card relative overflow-hidden">
+          <div key={stat.label} className="stat-card relative overflow-hidden p-6 lg:p-8">
             <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-10 rounded-full -translate-y-1/2 translate-x-1/2`} />
             <p className="stat-label">{stat.label}</p>
             <p className="stat-value">{stat.value}</p>
@@ -230,7 +231,7 @@ export default function TicketsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <div className="relative flex-1 max-w-md">
           <svg className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -246,7 +247,7 @@ export default function TicketsPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="input w-auto min-w-[180px]"
+          className="input w-full sm:w-auto sm:min-w-[180px]"
         >
           <option value="all">Tutti gli stati</option>
           {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}

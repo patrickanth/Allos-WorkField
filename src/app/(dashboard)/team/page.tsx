@@ -229,16 +229,16 @@ export default function TeamPage() {
       </div>
 
       {/* Invite Code Card */}
-      <div className="card p-8 mb-8">
-        <div className="flex items-center justify-between">
+      <div className="card p-8 lg:p-10 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
             <p className="text-[13px] text-zinc-500 uppercase tracking-wider font-semibold mb-3">Codice Invito</p>
-            <p className="text-3xl font-mono tracking-[0.3em] text-white font-bold">{team.inviteCode}</p>
+            <p className="text-2xl sm:text-3xl font-mono tracking-[0.2em] sm:tracking-[0.3em] text-white font-bold">{team.inviteCode}</p>
             <p className="text-[13px] text-zinc-500 mt-3">Condividi questo codice per invitare nuovi membri</p>
           </div>
           <button
             onClick={handleCopyCode}
-            className={`btn ${copied ? 'btn-glow' : 'btn-secondary'}`}
+            className={`btn ${copied ? 'btn-glow' : 'btn-secondary'} shrink-0 self-start sm:self-auto`}
           >
             {copied ? (
               <>
@@ -252,7 +252,8 @@ export default function TeamPage() {
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
-                Copia codice
+                <span className="hidden sm:inline">Copia codice</span>
+                <span className="sm:hidden">Copia</span>
               </>
             )}
           </button>
@@ -261,35 +262,35 @@ export default function TeamPage() {
 
       {/* Members */}
       <div className="card overflow-hidden">
-        <div className="p-6 border-b border-white/[0.06]">
-          <div className="flex items-center justify-between">
+        <div className="p-6 lg:p-8 border-b border-white/[0.06]">
+          <div className="flex items-center justify-between gap-4">
             <span className="text-[13px] text-zinc-500 uppercase tracking-wider font-semibold">
               Membri del team
             </span>
-            <span className="badge badge-purple">
+            <span className="badge badge-purple shrink-0">
               {team.members?.length || 0} {team.members?.length === 1 ? 'membro' : 'membri'}
             </span>
           </div>
         </div>
         <div className="divide-y divide-white/[0.04]">
           {team.members?.map((member) => (
-            <div key={member.id} className="p-5 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
-              <div className="flex items-center gap-4">
-                <div className={`avatar w-12 h-12 rounded-xl text-[15px] ${member.role === 'admin' ? 'avatar-glow' : ''}`}>
+            <div key={member.id} className="p-6 lg:p-8 flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className={`avatar w-12 h-12 rounded-xl text-[15px] shrink-0 ${member.role === 'admin' ? 'avatar-glow' : ''}`}>
                   {member.name.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <p className="text-[15px] text-white font-medium">
+                <div className="min-w-0">
+                  <p className="text-[15px] text-white font-medium truncate">
                     {member.name}
                     {member.id === session?.user?.id && (
                       <span className="text-zinc-500 ml-2 text-[13px]">(tu)</span>
                     )}
                   </p>
-                  <p className="text-[13px] text-zinc-500">{member.email}</p>
+                  <p className="text-[13px] text-zinc-500 truncate">{member.email}</p>
                 </div>
               </div>
               {member.role === 'admin' && (
-                <span className="badge badge-amber">
+                <span className="badge badge-amber shrink-0">
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>

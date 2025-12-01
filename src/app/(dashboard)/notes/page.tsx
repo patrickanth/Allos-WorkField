@@ -212,11 +212,11 @@ export default function NotesPage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {filteredNotes.map((note) => (
-            <div key={note.id} className="card p-6 sm:p-7 group overflow-visible">
+            <div key={note.id} className="card p-8 group overflow-visible">
               {/* Header */}
-              <div className="flex items-start justify-between gap-4 mb-5">
+              <div className="flex items-start justify-between gap-6 mb-6">
                 <span className={`badge ${note.isPrivate ? 'badge-purple' : 'badge-green'} shrink-0`}>
                   {note.isPrivate ? (
                     <>
@@ -279,12 +279,12 @@ export default function NotesPage() {
               </div>
 
               {/* Content */}
-              <p className="text-[15px] text-zinc-300 whitespace-pre-wrap line-clamp-5 mb-6 leading-relaxed">
+              <p className="text-[15px] text-zinc-300 whitespace-pre-wrap line-clamp-5 mb-8 leading-relaxed">
                 {note.content}
               </p>
 
               {/* Footer */}
-              <div className="flex items-center justify-between gap-4 pt-5 border-t border-white/[0.06]">
+              <div className="flex items-center justify-between gap-6 pt-6 border-t border-white/[0.06]">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="avatar w-8 h-8 rounded-lg text-[12px] shrink-0">
                     {note.author?.name?.charAt(0).toUpperCase()}
