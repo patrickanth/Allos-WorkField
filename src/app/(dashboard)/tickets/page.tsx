@@ -7,17 +7,17 @@ import { it } from 'date-fns/locale';
 import type { Ticket } from '@/types';
 
 const statusOptions = [
-  { value: 'open', label: 'Aperto', badge: 'badge-blue' },
-  { value: 'in_progress', label: 'In Corso', badge: 'badge-amber' },
-  { value: 'resolved', label: 'Risolto', badge: 'badge-green' },
-  { value: 'closed', label: 'Chiuso', badge: 'badge-default' },
+  { value: 'open', label: 'Aperto', badge: 'badge-blue', icon: '⚪' },
+  { value: 'in_progress', label: 'In Corso', badge: 'badge-amber', icon: '🟡' },
+  { value: 'resolved', label: 'Risolto', badge: 'badge-green', icon: '🟢' },
+  { value: 'closed', label: 'Chiuso', badge: 'badge-default', icon: '⚫' },
 ];
 
 const priorityOptions = [
-  { value: 'low', label: 'Bassa', badge: 'badge-default' },
-  { value: 'medium', label: 'Media', badge: 'badge-blue' },
-  { value: 'high', label: 'Alta', badge: 'badge-amber' },
-  { value: 'critical', label: 'Critica', badge: 'badge-red' },
+  { value: 'low', label: 'Bassa', badge: 'badge-default', icon: '⬇️' },
+  { value: 'medium', label: 'Media', badge: 'badge-blue', icon: '➡️' },
+  { value: 'high', label: 'Alta', badge: 'badge-amber', icon: '⬆️' },
+  { value: 'critical', label: 'Critica', badge: 'badge-red', icon: '🔴' },
 ];
 
 export default function TicketsPage() {
@@ -26,14 +26,17 @@ export default function TicketsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTicket, setEditingTicket] = useState<Ticket | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [expandedTicket, setExpandedTicket] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     priority: 'medium',
+    status: 'open',
   });
 
   useEffect(() => {
@@ -90,7 +93,7 @@ export default function TicketsPage() {
       });
       if (res.ok) {
         const updatedTicket = await res.json();
-        setTickets(tickets.map(t => t.id === updatedTicket.id ? updatedTicket : t));
+        setTickets(tickets.map(t => t.id === updatedTicket.id ? { ...t, ...updatedTicket } : t));
         resetForm();
         setIsModalOpen(false);
       }
@@ -110,7 +113,7 @@ export default function TicketsPage() {
       });
       if (res.ok) {
         const updatedTicket = await res.json();
-        setTickets(tickets.map(t => t.id === updatedTicket.id ? updatedTicket : t));
+        setTickets(tickets.map(t => t.id === updatedTicket.id ? { ...t, ...updatedTicket } : t));
       }
     } catch (error) {
       console.error('Error updating status:', error);
@@ -145,7 +148,7 @@ export default function TicketsPage() {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', description: '', priority: 'medium' });
+    setFormData({ name: '', description: '', priority: 'medium', status: 'open' });
     setEditingTicket(null);
   };
 
@@ -155,14 +158,17 @@ export default function TicketsPage() {
       name: ticket.name,
       description: ticket.description || '',
       priority: ticket.priority,
+      status: ticket.status,
     });
     setIsModalOpen(true);
   };
 
   const filteredTickets = tickets.filter(ticket => {
-    const matchesSearch = (ticket.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (ticket.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         (ticket.description || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesPriority = priorityFilter === 'all' || ticket.priority === priorityFilter;
+    return matchesSearch && matchesStatus && matchesPriority;
   });
 
   if (!session?.user?.teamId) {
@@ -188,10 +194,10 @@ export default function TicketsPage() {
   }
 
   const stats = [
-    { label: 'Totale', value: tickets.length, color: 'from-zinc-600 to-zinc-700' },
-    { label: 'Aperti', value: tickets.filter(t => t.status === 'open').length, color: 'from-blue-600 to-blue-700' },
-    { label: 'In Corso', value: tickets.filter(t => t.status === 'in_progress').length, color: 'from-amber-600 to-amber-700' },
-    { label: 'Completati', value: tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length, color: 'from-emerald-600 to-emerald-700' },
+    { label: 'Totale', value: tickets.length, color: 'from-zinc-600 to-zinc-700', icon: '📊' },
+    { label: 'Aperti', value: tickets.filter(t => t.status === 'open').length, color: 'from-blue-600 to-blue-700', icon: '🔵' },
+    { label: 'In Corso', value: tickets.filter(t => t.status === 'in_progress').length, color: 'from-amber-600 to-amber-700', icon: '🟡' },
+    { label: 'Completati', value: tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length, color: 'from-emerald-600 to-emerald-700', icon: '✅' },
   ];
 
   return (
@@ -224,45 +230,77 @@ export default function TicketsPage() {
         {stats.map((stat) => (
           <div key={stat.label} className="stat-card relative overflow-hidden">
             <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-10 rounded-full -translate-y-1/2 translate-x-1/2`} />
-            <p className="stat-label">{stat.label}</p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="stat-label">{stat.label}</p>
+              <span className="text-2xl">{stat.icon}</span>
+            </div>
             <p className="stat-value">{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
-        <div className="relative flex-1 max-w-md">
-          <svg className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      <div className="card p-6 mb-8">
+        <div className="flex items-center gap-3 mb-5">
+          <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
           </svg>
-          <input
-            type="text"
-            placeholder="Cerca ticket..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="input pl-14"
-          />
+          <span className="text-[13px] text-zinc-400 uppercase tracking-wider font-semibold">Filtri</span>
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="input w-full sm:w-auto sm:min-w-[180px]"
-        >
-          <option value="all">Tutti gli stati</option>
-          {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-        </select>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="relative">
+            <svg className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Cerca per titolo o descrizione..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input pl-14"
+            />
+          </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="input"
+          >
+            <option value="all">Tutti gli stati</option>
+            {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.icon} {opt.label}</option>)}
+          </select>
+          <select
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+            className="input"
+          >
+            <option value="all">Tutte le priorità</option>
+            {priorityOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.icon} {opt.label}</option>)}
+          </select>
+        </div>
+        {(searchQuery || statusFilter !== 'all' || priorityFilter !== 'all') && (
+          <div className="mt-4 flex items-center gap-3 text-[14px] text-zinc-400">
+            <span>Risultati: <span className="text-white font-semibold">{filteredTickets.length}</span></span>
+            <button
+              onClick={() => { setSearchQuery(''); setStatusFilter('all'); setPriorityFilter('all'); }}
+              className="text-indigo-400 hover:text-indigo-300 transition-colors"
+            >
+              Resetta filtri
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Table */}
+      {/* Tickets Grid */}
       {isLoading ? (
-        <div className="table-container">
-          <div className="p-8">
-            <div className="skeleton h-12 w-full mb-4" />
-            <div className="skeleton h-12 w-full mb-4" />
-            <div className="skeleton h-12 w-full mb-4" />
-            <div className="skeleton h-12 w-full" />
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="card">
+              <div className="skeleton h-6 w-32 mb-4" />
+              <div className="skeleton h-4 w-full mb-3" />
+              <div className="skeleton h-4 w-3/4 mb-4" />
+              <div className="skeleton h-10 w-full" />
+            </div>
+          ))}
         </div>
       ) : filteredTickets.length === 0 ? (
         <div className="card">
@@ -273,80 +311,104 @@ export default function TicketsPage() {
               </svg>
             </div>
             <p className="empty-title">Nessun ticket trovato</p>
-            <p className="empty-text">Crea il primo ticket per iniziare</p>
-            <button onClick={() => { resetForm(); setIsModalOpen(true); }} className="btn btn-glow mt-8">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Crea primo ticket
-            </button>
+            <p className="empty-text">
+              {searchQuery || statusFilter !== 'all' || priorityFilter !== 'all'
+                ? 'Prova a modificare i filtri di ricerca'
+                : 'Crea il primo ticket per iniziare'
+              }
+            </p>
+            {!searchQuery && statusFilter === 'all' && priorityFilter === 'all' && (
+              <button onClick={() => { resetForm(); setIsModalOpen(true); }} className="btn btn-glow mt-8">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Crea primo ticket
+              </button>
+            )}
           </div>
         </div>
       ) : (
-        <div className="table-container">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Ticket</th>
-                <th>Stato</th>
-                <th>Priorità</th>
-                <th>Autore</th>
-                <th>Data</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTickets.map((ticket) => (
-                <tr key={ticket.id}>
-                  <td>
-                    <p className="text-[15px] text-white font-medium mb-1">{ticket.name}</p>
-                    {ticket.description && (
-                      <p className="text-[13px] text-zinc-500 truncate max-w-sm">{ticket.description}</p>
-                    )}
-                  </td>
-                  <td>
-                    <select
-                      value={ticket.status}
-                      onChange={(e) => handleUpdateStatus(ticket.id, e.target.value)}
-                      className={`badge cursor-pointer ${statusOptions.find(s => s.value === ticket.status)?.badge}`}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {filteredTickets.map((ticket) => (
+            <div key={ticket.id} className="card group">
+              {/* Header */}
+              <div className="flex items-start justify-between gap-4 mb-5">
+                <h3 className="text-[17px] font-semibold text-white leading-tight flex-1">{ticket.name}</h3>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => openEditModal(ticket)}
+                    className="p-2 rounded-lg text-zinc-500 hover:text-white hover:bg-white/[0.06] opacity-0 group-hover:opacity-100 transition-all"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteTicket(ticket.id)}
+                    className="p-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Description */}
+              {ticket.description && (
+                <div className="mb-5">
+                  <p className={`text-[14px] text-zinc-400 leading-relaxed ${expandedTicket === ticket.id ? '' : 'line-clamp-2'}`}>
+                    {ticket.description}
+                  </p>
+                  {ticket.description.length > 100 && (
+                    <button
+                      onClick={() => setExpandedTicket(expandedTicket === ticket.id ? null : ticket.id)}
+                      className="text-[13px] text-indigo-400 hover:text-indigo-300 mt-2 transition-colors"
                     >
-                      {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                    </select>
-                  </td>
-                  <td>
-                    <span className={`badge ${priorityOptions.find(p => p.value === ticket.priority)?.badge}`}>
-                      {priorityOptions.find(p => p.value === ticket.priority)?.label}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar w-8 h-8 rounded-lg text-[11px]">
-                        {ticket.author?.name?.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="text-[14px] text-zinc-400">{ticket.author?.name}</span>
-                    </div>
-                  </td>
-                  <td className="text-[14px] text-zinc-500">
-                    {format(new Date(ticket.createdAt), 'd MMMM', { locale: it })}
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => openEditModal(ticket)} className="btn btn-ghost p-2.5 rounded-xl">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                      </button>
-                      <button onClick={() => handleDeleteTicket(ticket.id)} className="btn btn-ghost p-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      {expandedTicket === ticket.id ? 'Mostra meno' : 'Mostra tutto'}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Meta Info */}
+              <div className="flex flex-wrap items-center gap-3 mb-5 pb-5 border-b border-white/[0.06]">
+                <span className={`badge ${priorityOptions.find(p => p.value === ticket.priority)?.badge}`}>
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  {priorityOptions.find(p => p.value === ticket.priority)?.label}
+                </span>
+
+                <select
+                  value={ticket.status}
+                  onChange={(e) => handleUpdateStatus(ticket.id, e.target.value)}
+                  className={`badge cursor-pointer hover:opacity-80 transition-opacity ${statusOptions.find(s => s.value === ticket.status)?.badge}`}
+                  style={{ appearance: 'none', paddingRight: '28px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\'%3E%3Cpath fill=\'white\' d=\'M6 9L1.5 4.5 2.9 3.1 6 6.2 9.1 3.1 10.5 4.5z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
+                >
+                  {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                </select>
+
+                <div className="flex items-center gap-2 text-[13px] text-zinc-500 ml-auto">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {format(new Date(ticket.createdAt), 'd MMM yyyy', { locale: it })}
+                </div>
+              </div>
+
+              {/* Author */}
+              <div className="flex items-center gap-3">
+                <div className="avatar w-9 h-9 rounded-xl text-[13px] shrink-0">
+                  {ticket.author?.name?.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[13px] text-zinc-500">Creato da</p>
+                  <p className="text-[14px] text-white font-medium truncate">{ticket.author?.name}</p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -356,42 +418,66 @@ export default function TicketsPage() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2 className="modal-title">{editingTicket ? 'Modifica ticket' : 'Crea nuovo ticket'}</h2>
+              <p className="text-[14px] text-zinc-500 mt-2">Compila tutti i campi necessari per il ticket</p>
             </div>
             <div className="modal-body space-y-6">
               <div>
-                <label className="label">Nome del ticket</label>
+                <label className="label">Titolo del ticket *</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="input"
-                  placeholder="Inserisci il titolo del ticket"
+                  placeholder="es. Problema con il login"
                   autoFocus
                 />
               </div>
+
               <div>
-                <label className="label">Descrizione</label>
+                <label className="label">Descrizione dettagliata</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="input"
-                  rows={4}
-                  placeholder="Descrizione dettagliata (opzionale)"
+                  rows={5}
+                  placeholder="Descrivi il problema o la richiesta in modo dettagliato..."
                 />
+                <p className="text-[13px] text-zinc-500 mt-2">Una descrizione chiara aiuta a risolvere il ticket più velocemente</p>
               </div>
-              <div>
-                <label className="label">Priorità</label>
-                <div className="grid grid-cols-4 gap-3">
-                  {priorityOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, priority: opt.value })}
-                      className={`btn ${formData.priority === opt.value ? 'btn-glow' : 'btn-secondary'}`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="label">Priorità</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {priorityOptions.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, priority: opt.value })}
+                        className={`btn ${formData.priority === opt.value ? 'btn-glow' : 'btn-secondary'} py-3`}
+                      >
+                        <span className="text-lg">{opt.icon}</span>
+                        <span className="text-[13px]">{opt.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="label">Stato iniziale</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {statusOptions.slice(0, 2).map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, status: opt.value })}
+                        className={`btn ${formData.status === opt.value ? 'btn-glow' : 'btn-secondary'} py-3`}
+                      >
+                        <span className="text-lg">{opt.icon}</span>
+                        <span className="text-[13px]">{opt.label}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
