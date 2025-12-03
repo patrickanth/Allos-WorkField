@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { tickets, users } from '@/lib/storage';
+import { tickets, users } from '@/lib/firebase';
 
 export async function GET() {
   try {

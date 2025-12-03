@@ -558,3 +558,28 @@ export const tableConfigs = {
 };
 
 export { db };
+
+// ==================== HELPER FUNCTIONS ====================
+
+export async function initializeDefaultTableConfig(teamId: string): Promise<TableConfig> {
+  const existing = await tableConfigs.getDefaultByTeam(teamId);
+  if (existing) return existing;
+
+  // Generate unique IDs for columns
+  const defaultColumns: TableColumn[] = [
+    { id: Date.now().toString() + '-1', name: 'Nome Ticket', type: 'text', required: true, width: 200 },
+    { id: Date.now().toString() + '-2', name: 'Descrizione', type: 'text', required: false, width: 300 },
+    { id: Date.now().toString() + '-3', name: 'Stato', type: 'select', options: ['Aperto', 'In Corso', 'Risolto', 'Chiuso'], required: true, width: 150 },
+    { id: Date.now().toString() + '-4', name: 'Priorità', type: 'select', options: ['Bassa', 'Media', 'Alta', 'Critica'], required: true, width: 150 },
+    { id: Date.now().toString() + '-5', name: 'Tempo di Reazione (min)', type: 'number', required: false, width: 180 },
+    { id: Date.now().toString() + '-6', name: 'Tempo di Risoluzione (min)', type: 'number', required: false, width: 200 },
+    { id: Date.now().toString() + '-7', name: 'Data Creazione', type: 'date', required: true, width: 150 },
+  ];
+
+  return await tableConfigs.create({
+    name: 'Configurazione Default',
+    columns: defaultColumns,
+    teamId,
+    isDefault: true,
+  });
+}

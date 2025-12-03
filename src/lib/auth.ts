@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import { users, teams } from './storage';
+import { users, teams } from './firebase';
 import type { SessionUser } from '@/types';
 
 declare module 'next-auth' {
@@ -27,7 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const email = credentials.email as string;
         const password = credentials.password as string;
 
-        const user = users.getByEmail(email);
+        const user = await users.getByEmail(email);
         if (!user || !user.password) {
           return null;
         }
@@ -41,7 +41,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         let teamSlug: string | null = null;
 
         if (user.teamId) {
-          const team = teams.getById(user.teamId);
+          const team = await teams.getById(user.teamId);
           if (team) {
             teamName = team.name;
             teamSlug = team.slug;

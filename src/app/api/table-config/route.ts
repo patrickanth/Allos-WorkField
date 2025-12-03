@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { tableConfigs, initializeDefaultTableConfig } from '@/lib/storage';
+import { tableConfigs, initializeDefaultTableConfig } from '@/lib/firebase';
 
 export async function GET() {
   try {
@@ -13,11 +13,11 @@ export async function GET() {
       return NextResponse.json({ error: 'Devi far parte di un team' }, { status: 400 });
     }
 
-    let config = tableConfigs.getDefaultByTeam(session.user.teamId);
+    let config = await tableConfigs.getDefaultByTeam(session.user.teamId);
 
     // Initialize default config if not exists
     if (!config) {
-      config = initializeDefaultTableConfig(session.user.teamId);
+      config = await initializeDefaultTableConfig(session.user.teamId);
     }
 
     return NextResponse.json(config);
@@ -46,16 +46,16 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { columns, name } = body;
 
-    let config = tableConfigs.getDefaultByTeam(session.user.teamId);
+    let config = await tableConfigs.getDefaultByTeam(session.user.teamId);
 
     if (config) {
-      const updated = tableConfigs.update(config.id, {
+      const updated = await tableConfigs.update(config.id, {
         columns: columns || config.columns,
         name: name || config.name,
       });
       return NextResponse.json(updated);
     } else {
-      config = tableConfigs.create({
+      config = await tableConfigs.create({
         name: name || 'Configurazione Default',
         columns: columns || [],
         teamId: session.user.teamId,

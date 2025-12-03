@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { notes } from '@/lib/storage';
+import { notes } from '@/lib/firebase';
 
 export async function PATCH(
   request: NextRequest,
@@ -15,7 +15,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    const note = notes.getById(id);
+    const note = await notes.getById(id);
     if (!note) {
       return NextResponse.json({ error: 'Nota non trovata' }, { status: 404 });
     }
@@ -24,7 +24,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 });
     }
 
-    const updated = notes.update(id, {
+    const updated = await notes.update(id, {
       content: body.content,
       isPrivate: body.isPrivate,
       teamId: body.isPrivate === false && session.user.teamId ? session.user.teamId : null,
@@ -49,7 +49,7 @@ export async function DELETE(
 
     const { id } = await params;
 
-    const note = notes.getById(id);
+    const note = await notes.getById(id);
     if (!note) {
       return NextResponse.json({ error: 'Nota non trovata' }, { status: 404 });
     }
@@ -58,7 +58,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 });
     }
 
-    notes.delete(id);
+    await notes.delete(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Delete note error:', error);
