@@ -20,6 +20,18 @@ export interface Team {
   members?: User[];
 }
 
+export interface Client {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  company?: string | null;
+  notes?: string | null;
+  teamId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Note {
   id: string;
   content: string;
@@ -29,7 +41,9 @@ export interface Note {
   updatedAt: Date;
   authorId: string;
   teamId?: string | null;
+  clientId?: string | null;
   author?: User;
+  client?: Client;
 }
 
 export interface Ticket {
@@ -38,6 +52,9 @@ export interface Ticket {
   description?: string | null;
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   priority: 'low' | 'medium' | 'high' | 'critical';
+  category?: string | null;
+  tags?: string[];
+  dueDate?: Date | null;
   reactionTime?: number | null;
   resolutionTime?: number | null;
   customFields?: Record<string, unknown>;
@@ -45,9 +62,11 @@ export interface Ticket {
   updatedAt: Date;
   authorId: string;
   assigneeId?: string | null;
+  clientId?: string | null;
   teamId: string;
   author?: User;
   assignee?: User | null;
+  client?: Client;
 }
 
 export interface TableColumn {
@@ -78,4 +97,38 @@ export interface SessionUser {
   teamId?: string | null;
   teamName?: string | null;
   teamSlug?: string | null;
+}
+
+export interface VisualBoardNode {
+  id: string;
+  type: 'client' | 'ticket' | 'note' | 'custom';
+  label: string;
+  data: {
+    entityId?: string;
+    color?: string;
+    icon?: string;
+    metadata?: Record<string, unknown>;
+  };
+  position: { x: number; y: number };
+}
+
+export interface VisualBoardEdge {
+  id: string;
+  source: string;
+  target: string;
+  label?: string;
+  type?: 'default' | 'smooth' | 'step';
+}
+
+export interface VisualBoard {
+  id: string;
+  name: string;
+  description?: string | null;
+  nodes: VisualBoardNode[];
+  edges: VisualBoardEdge[];
+  teamId: string;
+  authorId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  author?: User;
 }

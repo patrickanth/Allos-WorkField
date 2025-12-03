@@ -5,25 +5,27 @@ import { useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
-import type { Note } from '@/types';
+import type { Note, Client } from '@/types';
 
 export default function NotesPage() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const view = searchParams.get('view') || 'private';
 
-  const [notes, setNotes] = useState<(Note & { author?: { id: string; name: string; avatar: string | null } })[]>([]);
+  const [notes, setNotes] = useState<(Note & { author?: { id: string; name: string; avatar: string | null }; client?: Client })[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [newNoteContent, setNewNoteContent] = useState('');
   const [newNotePrivate, setNewNotePrivate] = useState(view === 'private');
+  const [selectedClientId, setSelectedClientId] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchNotes();
+    Promise.all([fetchNotes(), fetchClients()]);
   }, [view]);
 
   useEffect(() => {
@@ -43,6 +45,16 @@ export default function NotesPage() {
     }
   };
 
+  const fetchClients = async () => {
+    try {
+      const res = await fetch('/api/clients');
+      const data = await res.json();
+      if (Array.isArray(data)) setClients(data);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+    }
+  };
+
   const handleCreateNote = async () => {
     if (!newNoteContent.trim()) return;
     setIsSubmitting(true);
@@ -50,7 +62,11 @@ export default function NotesPage() {
       const res = await fetch('/api/notes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newNoteContent, isPrivate: newNotePrivate }),
+        body: JSON.stringify({
+          content: newNoteContent,
+          isPrivate: newNotePrivate,
+          clientId: selectedClientId || null,
+        }),
       });
       if (res.ok) {
         const newNote = await res.json();
@@ -58,6 +74,7 @@ export default function NotesPage() {
           setNotes([newNote, ...notes]);
         }
         setNewNoteContent('');
+        setSelectedClientId('');
         setIsModalOpen(false);
       }
     } catch (error) {
@@ -74,13 +91,18 @@ export default function NotesPage() {
       const res = await fetch(`/api/notes/${editingNote.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newNoteContent, isPrivate: newNotePrivate }),
+        body: JSON.stringify({
+          content: newNoteContent,
+          isPrivate: newNotePrivate,
+          clientId: selectedClientId || null,
+        }),
       });
       if (res.ok) {
         const updatedNote = await res.json();
         setNotes(notes.map(n => n.id === updatedNote.id ? { ...n, ...updatedNote } : n));
         setEditingNote(null);
         setNewNoteContent('');
+        setSelectedClientId('');
         setIsModalOpen(false);
       }
     } catch (error) {
@@ -119,6 +141,7 @@ export default function NotesPage() {
     setEditingNote(note);
     setNewNoteContent(note.content || '');
     setNewNotePrivate(note.isPrivate);
+    setSelectedClientId(note.clientId || '');
     setIsModalOpen(true);
     setOpenMenuId(null);
   };
@@ -127,12 +150,13 @@ export default function NotesPage() {
     setEditingNote(null);
     setNewNoteContent('');
     setNewNotePrivate(view === 'private');
+    setSelectedClientId('');
     setIsModalOpen(true);
   };
 
-  // Fixed: Added null check for note.content
   const filteredNotes = notes.filter(note =>
-    (note.content || '').toLowerCase().includes(searchQuery.toLowerCase())
+    (note.content || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (note.client?.name || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const canShare = session?.user?.teamId;
@@ -152,7 +176,7 @@ export default function NotesPage() {
             }
           </p>
         </div>
-        <button onClick={openCreateModal} className="btn btn-primary shrink-0 self-start">
+        <button onClick={openCreateModal} className="btn btn-glow shrink-0 self-start">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
@@ -169,7 +193,7 @@ export default function NotesPage() {
           </svg>
           <input
             type="text"
-            placeholder="Cerca nelle tue note..."
+            placeholder="Cerca nelle note o per cliente..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input pl-14"
@@ -217,23 +241,30 @@ export default function NotesPage() {
             <div key={note.id} className="card group relative">
               {/* Header */}
               <div className="flex items-start justify-between gap-6 mb-6">
-                <span className={`badge ${note.isPrivate ? 'badge-purple' : 'badge-green'} shrink-0`}>
-                  {note.isPrivate ? (
-                    <>
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      Privata
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      Team
-                    </>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`badge ${note.isPrivate ? 'badge-purple' : 'badge-green'} shrink-0`}>
+                    {note.isPrivate ? (
+                      <>
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Privata
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Team
+                      </>
+                    )}
+                  </span>
+                  {note.client && (
+                    <span className="badge badge-blue shrink-0">
+                      👤 {note.client.name}
+                    </span>
                   )}
-                </span>
+                </div>
                 {note.authorId === session?.user?.id && (
                   <div className="relative shrink-0">
                     <button
@@ -314,10 +345,24 @@ export default function NotesPage() {
                   value={newNoteContent}
                   onChange={(e) => setNewNoteContent(e.target.value)}
                   placeholder="Scrivi qui la tua nota..."
-                  className="input"
-                  rows={6}
+                  className="input w-full min-h-[120px] resize-none"
                   autoFocus
                 />
+              </div>
+
+              <div>
+                <label className="label">Cliente (opzionale)</label>
+                <select
+                  value={selectedClientId}
+                  onChange={(e) => setSelectedClientId(e.target.value)}
+                  className="input w-full"
+                >
+                  <option value="">Nessun cliente collegato</option>
+                  {clients.map(client => (
+                    <option key={client.id} value={client.id}>{client.name}</option>
+                  ))}
+                </select>
+                <p className="text-[13px] text-zinc-500 mt-2">Collega questa nota a un cliente specifico per un'organizzazione migliore</p>
               </div>
 
               <div>
@@ -356,13 +401,13 @@ export default function NotesPage() {
               </div>
             </div>
             <div className="modal-footer">
-              <button onClick={() => { setIsModalOpen(false); setEditingNote(null); setNewNoteContent(''); }} className="btn btn-ghost">
+              <button onClick={() => { setIsModalOpen(false); setEditingNote(null); setNewNoteContent(''); setSelectedClientId(''); }} className="btn btn-ghost">
                 Annulla
               </button>
               <button
                 onClick={editingNote ? handleUpdateNote : handleCreateNote}
                 disabled={!newNoteContent.trim() || isSubmitting}
-                className="btn btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                className="btn btn-glow disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">

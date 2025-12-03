@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { tickets, users } from '@/lib/storage';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { tickets, users, clients } from '@/lib/firebase';
 import * as XLSX from 'xlsx';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
     }
@@ -17,18 +18,43 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const format = searchParams.get('format') || 'xlsx';
 
-    const teamTickets = tickets.getByTeam(session.user.teamId);
+    const teamTickets = await tickets.getByTeam(session.user.teamId);
+    const allClients = await clients.getByTeam(session.user.teamId);
+    const allUsers = await users.getByTeam(session.user.teamId);
 
-    // Prepare data for export
+    // Create lookup maps for better performance
+    const clientsMap = new Map(allClients.map(c => [c.id, c]));
+    const usersMap = new Map(allUsers.map(u => [u.id, u]));
+
+    // Prepare data for export with all fields
     const exportData = teamTickets.map(ticket => {
-      const author = users.getById(ticket.authorId);
-      const assignee = ticket.assigneeId ? users.getById(ticket.assigneeId) : null;
+      const author = usersMap.get(ticket.authorId);
+      const assignee = ticket.assigneeId ? usersMap.get(ticket.assigneeId) : null;
+      const client = ticket.clientId ? clientsMap.get(ticket.clientId) : null;
+
+      const statusLabels = {
+        open: 'Aperto',
+        in_progress: 'In Corso',
+        resolved: 'Risolto',
+        closed: 'Chiuso',
+      };
+
+      const priorityLabels = {
+        low: 'Bassa',
+        medium: 'Media',
+        high: 'Alta',
+        critical: 'Critica',
+      };
 
       const baseData: Record<string, unknown> = {
         'Nome Ticket': ticket.name,
         'Descrizione': ticket.description || '',
-        'Stato': ticket.status === 'open' ? 'Aperto' : ticket.status === 'in_progress' ? 'In Corso' : ticket.status === 'resolved' ? 'Risolto' : 'Chiuso',
-        'Priorità': ticket.priority === 'low' ? 'Bassa' : ticket.priority === 'medium' ? 'Media' : ticket.priority === 'high' ? 'Alta' : 'Critica',
+        'Cliente': client?.name || '',
+        'Categoria': ticket.category || '',
+        'Tags': ticket.tags && ticket.tags.length > 0 ? ticket.tags.join(', ') : '',
+        'Stato': statusLabels[ticket.status] || ticket.status,
+        'Priorità': priorityLabels[ticket.priority] || ticket.priority,
+        'Data Scadenza': ticket.dueDate ? new Date(ticket.dueDate).toLocaleDateString('it-IT') : '',
         'Tempo di Reazione (min)': ticket.reactionTime || '',
         'Tempo di Risoluzione (min)': ticket.resolutionTime || '',
         'Autore': author?.name || '',
@@ -39,14 +65,9 @@ export async function GET(request: NextRequest) {
 
       // Add custom fields if present
       if (ticket.customFields) {
-        try {
-          const customFields = JSON.parse(ticket.customFields);
-          Object.entries(customFields).forEach(([key, value]) => {
-            baseData[key] = value;
-          });
-        } catch {
-          // Ignore parsing errors
-        }
+        Object.entries(ticket.customFields).forEach(([key, value]) => {
+          baseData[key] = value;
+        });
       }
 
       return baseData;
@@ -71,12 +92,16 @@ export async function GET(request: NextRequest) {
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(exportData);
 
-    // Set column widths
+    // Set column widths (updated to include new fields)
     const colWidths = [
       { wch: 30 }, // Nome Ticket
       { wch: 50 }, // Descrizione
+      { wch: 20 }, // Cliente
+      { wch: 20 }, // Categoria
+      { wch: 30 }, // Tags
       { wch: 15 }, // Stato
       { wch: 15 }, // Priorità
+      { wch: 15 }, // Data Scadenza
       { wch: 20 }, // Tempo di Reazione
       { wch: 20 }, // Tempo di Risoluzione
       { wch: 20 }, // Autore
