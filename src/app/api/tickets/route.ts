@@ -13,19 +13,19 @@ export async function GET() {
       return NextResponse.json({ error: 'Devi far parte di un team' }, { status: 400 });
     }
 
-    const teamTickets = tickets.getByTeam(session.user.teamId);
+    const teamTickets = await tickets.getByTeam(session.user.teamId);
 
     // Add author and assignee info
-    const ticketsWithUsers = teamTickets.map(ticket => {
-      const author = users.getById(ticket.authorId);
-      const assignee = ticket.assigneeId ? users.getById(ticket.assigneeId) : null;
+    const ticketsWithUsers = await Promise.all(teamTickets.map(async ticket => {
+      const author = await users.getById(ticket.authorId);
+      const assignee = ticket.assigneeId ? await users.getById(ticket.assigneeId) : null;
 
       return {
         ...ticket,
         author: author ? { id: author.id, name: author.name, avatar: author.avatar } : null,
         assignee: assignee ? { id: assignee.id, name: assignee.name, avatar: assignee.avatar } : null,
       };
-    });
+    }));
 
     // Sort by createdAt desc
     ticketsWithUsers.sort((a, b) =>
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Il nome è obbligatorio' }, { status: 400 });
     }
 
-    const newTicket = tickets.create({
+    const newTicket = await tickets.create({
       name: name.trim(),
       description: description?.trim() || null,
       status: 'open',
@@ -70,8 +70,8 @@ export async function POST(request: NextRequest) {
       teamId: session.user.teamId,
     });
 
-    const author = users.getById(session.user.id);
-    const assignee = newTicket.assigneeId ? users.getById(newTicket.assigneeId) : null;
+    const author = await users.getById(session.user.id);
+    const assignee = newTicket.assigneeId ? await users.getById(newTicket.assigneeId) : null;
 
     return NextResponse.json({
       ...newTicket,

@@ -10,9 +10,9 @@ export async function GET() {
     }
 
     if (session.user.teamId) {
-      const team = teams.getById(session.user.teamId);
+      const team = await teams.getById(session.user.teamId);
       if (team) {
-        const members = users.getByTeam(team.id);
+        const members = await users.getByTeam(team.id);
         return NextResponse.json({ ...team, members });
       }
     }
@@ -44,12 +44,12 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
 
-    const existingTeam = teams.getBySlug(slug);
+    const existingTeam = await teams.getBySlug(slug);
     if (existingTeam) {
       return NextResponse.json({ error: 'Un team con questo nome esiste già' }, { status: 400 });
     }
 
-    const newTeam = teams.create({
+    const newTeam = await teams.create({
       name,
       slug,
       description: description || null,
