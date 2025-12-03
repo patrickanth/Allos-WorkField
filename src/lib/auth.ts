@@ -28,7 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = credentials.password as string;
 
         const user = users.getByEmail(email);
-        if (!user) {
+        if (!user || !user.password) {
           return null;
         }
 
@@ -87,6 +87,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user = {
         id: token.id as string,
         email: token.email as string,
+        emailVerified: null,
         name: token.name as string,
         avatar: token.avatar as string | null,
         role: token.role as string,

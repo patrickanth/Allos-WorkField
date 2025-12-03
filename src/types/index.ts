@@ -1,6 +1,7 @@
 export interface User {
   id: string;
   email: string;
+  password?: string; // Only used internally, never exposed to client
   name: string;
   avatar?: string | null;
   role: string;

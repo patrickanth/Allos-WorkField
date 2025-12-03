@@ -34,17 +34,33 @@ if (!getApps().length) {
       };
     }
 
-    initializeApp({
-      credential: cert(serviceAccount),
-    });
-
-    console.log('✅ Firebase Admin inizializzato con successo');
+    // Verifica che le credenziali siano valide prima di inizializzare
+    if (serviceAccount && serviceAccount.projectId && serviceAccount.clientEmail && serviceAccount.privateKey) {
+      initializeApp({
+        credential: cert(serviceAccount),
+      });
+      console.log('✅ Firebase Admin inizializzato con successo');
+    } else {
+      console.warn('⚠️  Credenziali Firebase non configurate. Alcune funzionalità potrebbero non funzionare.');
+    }
   } catch (error) {
     console.error('❌ Firebase admin initialization error:', error);
   }
 }
 
-const db = getFirestore();
+// Get Firestore only if app is initialized
+let db: ReturnType<typeof getFirestore>;
+try {
+  if (getApps().length > 0) {
+    db = getFirestore();
+  } else {
+    // Create a mock db for build time when Firebase isn't initialized
+    db = {} as ReturnType<typeof getFirestore>;
+  }
+} catch (error) {
+  console.warn('⚠️  Impossibile inizializzare Firestore');
+  db = {} as ReturnType<typeof getFirestore>;
+}
 
 // Helper to convert Firestore timestamp to Date
 function timestampToDate(timestamp: any): Date {
