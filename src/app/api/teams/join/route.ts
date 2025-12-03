@@ -16,13 +16,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Codice invito obbligatorio' }, { status: 400 });
     }
 
-    const team = teams.getByInviteCode(inviteCode.toUpperCase());
+    const team = await teams.getByInviteCode(inviteCode.toUpperCase());
     if (!team) {
       return NextResponse.json({ error: 'Codice invito non valido' }, { status: 400 });
     }
 
     // Update user to be part of this team
-    users.update(session.user.id, { teamId: team.id, role: 'member' });
+    await users.update(session.user.id, { teamId: team.id, role: 'member' });
 
     return NextResponse.json(team);
   } catch (error) {

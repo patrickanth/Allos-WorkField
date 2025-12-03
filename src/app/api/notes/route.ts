@@ -12,29 +12,29 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type'); // 'private' | 'shared' | 'all'
 
-    let result: typeof notes extends { getAll: () => infer R } ? R : never = [];
+    let result: Awaited<ReturnType<typeof notes.getAll>>;
 
     if (type === 'private') {
-      result = notes.getPrivateByAuthor(session.user.id);
+      result = await notes.getPrivateByAuthor(session.user.id);
     } else if (type === 'shared' && session.user.teamId) {
-      result = notes.getSharedByTeam(session.user.teamId);
+      result = await notes.getByTeam(session.user.teamId);
     } else {
       // Get all notes for current user (private + shared from team)
-      const privateNotes = notes.getPrivateByAuthor(session.user.id);
+      const privateNotes = await notes.getPrivateByAuthor(session.user.id);
       const sharedNotes = session.user.teamId
-        ? notes.getSharedByTeam(session.user.teamId)
+        ? await notes.getByTeam(session.user.teamId)
         : [];
       result = [...privateNotes, ...sharedNotes];
     }
 
     // Add author info
-    const notesWithAuthors = result.map(note => {
-      const author = users.getById(note.authorId);
+    const notesWithAuthors = await Promise.all(result.map(async note => {
+      const author = await users.getById(note.authorId);
       return {
         ...note,
         author: author ? { id: author.id, name: author.name, avatar: author.avatar } : null,
       };
-    });
+    }));
 
     // Sort by timestamp desc
     notesWithAuthors.sort((a, b) =>
@@ -62,14 +62,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Il contenuto è obbligatorio' }, { status: 400 });
     }
 
-    const newNote = notes.create({
+    const newNote = await notes.create({
       content: content.trim(),
       isPrivate: isPrivate ?? true,
       authorId: session.user.id,
       teamId: !isPrivate && session.user.teamId ? session.user.teamId : null,
     });
 
-    const author = users.getById(session.user.id);
+    const author = await users.getById(session.user.id);
 
     return NextResponse.json({
       ...newNote,

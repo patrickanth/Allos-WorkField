@@ -1,6 +1,6 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
-import type { User, Team, Note, Ticket, Client, VisualBoard, TableConfig } from '@/types';
+import type { User, Team, Note, Ticket, Client, VisualBoard, TableConfig, TableColumn } from '@/types';
 import * as fs from 'fs';
 import * as path from 'path';
 

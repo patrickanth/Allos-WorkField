@@ -15,7 +15,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    const ticket = tickets.getById(id);
+    const ticket = await tickets.getById(id);
     if (!ticket) {
       return NextResponse.json({ error: 'Ticket non trovato' }, { status: 404 });
     }
@@ -35,14 +35,14 @@ export async function PATCH(
     if (body.assigneeId !== undefined) updateData.assigneeId = body.assigneeId;
     if (body.customFields !== undefined) updateData.customFields = JSON.stringify(body.customFields);
 
-    const updated = tickets.update(id, updateData as Parameters<typeof tickets.update>[1]);
+    const updated = await tickets.update(id, updateData as Parameters<typeof tickets.update>[1]);
 
     if (!updated) {
       return NextResponse.json({ error: 'Errore nell\'aggiornamento' }, { status: 500 });
     }
 
-    const author = users.getById(updated.authorId);
-    const assignee = updated.assigneeId ? users.getById(updated.assigneeId) : null;
+    const author = await users.getById(updated.authorId);
+    const assignee = updated.assigneeId ? await users.getById(updated.assigneeId) : null;
 
     return NextResponse.json({
       ...updated,
@@ -67,7 +67,7 @@ export async function DELETE(
 
     const { id } = await params;
 
-    const ticket = tickets.getById(id);
+    const ticket = await tickets.getById(id);
     if (!ticket) {
       return NextResponse.json({ error: 'Ticket non trovato' }, { status: 404 });
     }
@@ -81,7 +81,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 });
     }
 
-    tickets.delete(id);
+    await tickets.delete(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Delete ticket error:', error);
