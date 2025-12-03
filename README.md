@@ -66,17 +66,35 @@ Il progetto è configurato per utilizzare **Firebase Firestore**:
 
 ## 🌍 Environment Variables
 
-Crea un file `.env.local` nella root:
+### Setup Rapido per Sviluppo
+
+1. **Scarica le credenziali Firebase**:
+   - Vai su [Firebase Console](https://console.firebase.google.com/)
+   - Seleziona il tuo progetto
+   - **Impostazioni progetto** → **Account di servizio**
+   - Clicca **Genera nuova chiave privata**
+   - Salva il file come `firebase-service-account.json` nella **root del progetto**
+
+2. **Crea file `.env.local`** (solo NextAuth):
 
 ```bash
-# Database
-DATABASE_URL="file:./dev.db"
+# NextAuth
+NEXTAUTH_SECRET="genera-con: openssl rand -base64 32"
+NEXTAUTH_URL="http://localhost:3000"
+```
 
+**Fatto!** 🎉 Il sistema caricherà automaticamente le credenziali Firebase dal file JSON.
+
+### Setup Produzione (Vercel/Firebase Hosting)
+
+Per produzione, configura le variabili d'ambiente nella dashboard del tuo hosting:
+
+```bash
 # NextAuth
 NEXTAUTH_SECRET="your-secret-key-min-32-chars"
-NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_URL="https://your-domain.com"
 
-# Firebase
+# Firebase (copia dal file firebase-service-account.json)
 FIREBASE_PROJECT_ID="your-project-id"
 FIREBASE_CLIENT_EMAIL="your-service-account@your-project.iam.gserviceaccount.com"
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour-Key\n-----END PRIVATE KEY-----"

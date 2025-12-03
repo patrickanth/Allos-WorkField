@@ -45,3 +45,7 @@ data/
 # Desktop Agent
 desktop-agent/node_modules
 desktop-agent/dist
+
+# Firebase
+.firebase
+firebase-service-account.json
