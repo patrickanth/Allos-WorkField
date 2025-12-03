@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { teams, users } from '@/lib/storage';
+import { teams, users } from '@/lib/firebase';
 
 export async function POST(request: NextRequest) {
   try {

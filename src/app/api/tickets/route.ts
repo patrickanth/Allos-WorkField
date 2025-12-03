@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { tickets, users } from '@/lib/storage';
+import { tickets, users } from '@/lib/firebase';
 
 export async function GET() {
   try {
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       priority: priority || 'medium',
       reactionTime: reactionTime || null,
       resolutionTime: resolutionTime || null,
-      customFields: customFields ? JSON.stringify(customFields) : null,
+      customFields: customFields || undefined,
       authorId: session.user.id,
       assigneeId: assigneeId || null,
       teamId: session.user.teamId,

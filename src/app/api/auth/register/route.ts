@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { users, teams } from '@/lib/storage';
+import { users, teams } from '@/lib/firebase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existingUser = users.getByEmail(email);
+    const existingUser = await users.getByEmail(email);
     if (existingUser) {
       return NextResponse.json(
         { error: 'Email già registrata' },
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     let teamId: string | undefined;
 
     if (teamCode) {
-      const team = teams.getByInviteCode(teamCode.toUpperCase());
+      const team = await teams.getByInviteCode(teamCode.toUpperCase());
       if (!team) {
         return NextResponse.json(
           { error: 'Codice team non valido' },
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       teamId = team.id;
     }
 
-    const newUser = users.create({
+    const newUser = await users.create({
       email,
       password: hashedPassword,
       name,
