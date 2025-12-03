@@ -1,19 +1,46 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
 import type { User, Team, Note, Ticket, Client, VisualBoard, TableConfig } from '@/types';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Initialize Firebase Admin
 if (!getApps().length) {
   try {
-    initializeApp({
-      credential: cert({
+    let serviceAccount;
+
+    // In sviluppo, carica automaticamente da file JSON
+    if (process.env.NODE_ENV === 'development') {
+      const serviceAccountPath = path.join(process.cwd(), 'firebase-service-account.json');
+
+      if (fs.existsSync(serviceAccountPath)) {
+        console.log('🔥 Caricamento credenziali Firebase da file JSON...');
+        serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+      } else {
+        console.warn('⚠️  File firebase-service-account.json non trovato, uso variabili d\'ambiente');
+        serviceAccount = {
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        };
+      }
+    } else {
+      // In produzione, usa variabili d'ambiente
+      console.log('🔥 Caricamento credenziali Firebase da variabili d\'ambiente...');
+      serviceAccount = {
         projectId: process.env.FIREBASE_PROJECT_ID,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
         privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      }),
+      };
+    }
+
+    initializeApp({
+      credential: cert(serviceAccount),
     });
+
+    console.log('✅ Firebase Admin inizializzato con successo');
   } catch (error) {
-    console.error('Firebase admin initialization error:', error);
+    console.error('❌ Firebase admin initialization error:', error);
   }
 }
 
