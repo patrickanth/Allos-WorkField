@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
-import type { Ticket } from '@/types';
+import type { Ticket, Client, User } from '@/types';
 
 const statusOptions = [
   { value: 'open', label: 'Aperto', badge: 'badge-blue', icon: '⚪' },
@@ -20,9 +20,21 @@ const priorityOptions = [
   { value: 'critical', label: 'Critica', badge: 'badge-red', icon: '🔴' },
 ];
 
+const categoryOptions = [
+  'Support',
+  'Bug',
+  'Feature Request',
+  'Incident',
+  'Maintenance',
+  'Question',
+  'Other',
+];
+
 export default function TicketsPage() {
   const { data: session } = useSession();
-  const [tickets, setTickets] = useState<(Ticket & { author?: { id: string; name: string } })[]>([]);
+  const [tickets, setTickets] = useState<(Ticket & { author?: User; assignee?: User | null; client?: Client })[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [teamMembers, setTeamMembers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -31,17 +43,24 @@ export default function TicketsPage() {
   const [editingTicket, setEditingTicket] = useState<Ticket | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedTicket, setExpandedTicket] = useState<string | null>(null);
+  const [showNewClientForm, setShowNewClientForm] = useState(false);
+  const [newClientName, setNewClientName] = useState('');
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     priority: 'medium',
     status: 'open',
+    category: '',
+    tags: [] as string[],
+    dueDate: '',
+    clientId: '',
+    assigneeId: '',
   });
 
   useEffect(() => {
     if (session?.user?.teamId) {
-      fetchTickets();
+      Promise.all([fetchTickets(), fetchClients(), fetchTeamMembers()]);
     } else {
       setIsLoading(false);
     }
@@ -60,14 +79,62 @@ export default function TicketsPage() {
     }
   };
 
+  const fetchClients = async () => {
+    try {
+      const res = await fetch('/api/clients');
+      const data = await res.json();
+      if (Array.isArray(data)) setClients(data);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+    }
+  };
+
+  const fetchTeamMembers = async () => {
+    try {
+      const res = await fetch('/api/teams/members');
+      const data = await res.json();
+      if (Array.isArray(data)) setTeamMembers(data);
+    } catch (error) {
+      console.error('Error fetching team members:', error);
+    }
+  };
+
+  const handleCreateClient = async () => {
+    if (!newClientName.trim()) return;
+    try {
+      const res = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newClientName.trim() }),
+      });
+      if (res.ok) {
+        const newClient = await res.json();
+        setClients([...clients, newClient]);
+        setFormData({ ...formData, clientId: newClient.id });
+        setNewClientName('');
+        setShowNewClientForm(false);
+      }
+    } catch (error) {
+      console.error('Error creating client:', error);
+    }
+  };
+
   const handleCreateTicket = async () => {
     if (!formData.name.trim()) return;
     setIsSubmitting(true);
     try {
+      const payload = {
+        ...formData,
+        tags: formData.tags.filter(t => t.trim()),
+        dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
+        clientId: formData.clientId || null,
+        assigneeId: formData.assigneeId || null,
+        category: formData.category || null,
+      };
       const res = await fetch('/api/tickets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         const newTicket = await res.json();
@@ -86,10 +153,18 @@ export default function TicketsPage() {
     if (!editingTicket) return;
     setIsSubmitting(true);
     try {
+      const payload = {
+        ...formData,
+        tags: formData.tags.filter(t => t.trim()),
+        dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
+        clientId: formData.clientId || null,
+        assigneeId: formData.assigneeId || null,
+        category: formData.category || null,
+      };
       const res = await fetch(`/api/tickets/${editingTicket.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         const updatedTicket = await res.json();
@@ -148,7 +223,17 @@ export default function TicketsPage() {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', description: '', priority: 'medium', status: 'open' });
+    setFormData({
+      name: '',
+      description: '',
+      priority: 'medium',
+      status: 'open',
+      category: '',
+      tags: [],
+      dueDate: '',
+      clientId: '',
+      assigneeId: '',
+    });
     setEditingTicket(null);
   };
 
@@ -159,8 +244,24 @@ export default function TicketsPage() {
       description: ticket.description || '',
       priority: ticket.priority,
       status: ticket.status,
+      category: ticket.category || '',
+      tags: ticket.tags || [],
+      dueDate: ticket.dueDate ? format(new Date(ticket.dueDate), 'yyyy-MM-dd') : '',
+      clientId: ticket.clientId || '',
+      assigneeId: ticket.assigneeId || '',
     });
     setIsModalOpen(true);
+  };
+
+  const addTag = (tag: string) => {
+    const trimmed = tag.trim();
+    if (trimmed && !formData.tags.includes(trimmed)) {
+      setFormData({ ...formData, tags: [...formData.tags, trimmed] });
+    }
+  };
+
+  const removeTag = (tag: string) => {
+    setFormData({ ...formData, tags: formData.tags.filter(t => t !== tag) });
   };
 
   const filteredTickets = tickets.filter(ticket => {
@@ -206,7 +307,7 @@ export default function TicketsPage() {
       <div className="page-header flex flex-col lg:flex-row lg:items-start justify-between gap-6">
         <div>
           <h1 className="page-title">Tickets</h1>
-          <p className="page-subtitle">Gestione e monitoraggio dei ticket del team</p>
+          <p className="page-subtitle">Gestione e monitoraggio completo dei ticket del team</p>
         </div>
         <div className="flex items-center gap-4 shrink-0">
           <button onClick={() => handleExport('xlsx')} className="btn btn-secondary">
@@ -215,7 +316,7 @@ export default function TicketsPage() {
             </svg>
             <span className="hidden sm:inline">Esporta</span>
           </button>
-          <button onClick={() => { resetForm(); setIsModalOpen(true); }} className="btn btn-primary">
+          <button onClick={() => { resetForm(); setIsModalOpen(true); }} className="btn btn-glow">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
@@ -354,6 +455,22 @@ export default function TicketsPage() {
                 </div>
               </div>
 
+              {/* Client & Category */}
+              {(ticket.client || ticket.category) && (
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  {ticket.client && (
+                    <span className="badge badge-blue">
+                      👤 {ticket.client.name}
+                    </span>
+                  )}
+                  {ticket.category && (
+                    <span className="badge badge-default">
+                      📁 {ticket.category}
+                    </span>
+                  )}
+                </div>
+              )}
+
               {/* Description */}
               {ticket.description && (
                 <div className="mb-5">
@@ -368,6 +485,17 @@ export default function TicketsPage() {
                       {expandedTicket === ticket.id ? 'Mostra meno' : 'Mostra tutto'}
                     </button>
                   )}
+                </div>
+              )}
+
+              {/* Tags */}
+              {ticket.tags && ticket.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {ticket.tags.map((tag, idx) => (
+                    <span key={idx} className="badge badge-default text-[12px]">
+                      🏷️ {tag}
+                    </span>
+                  ))}
                 </div>
               )}
 
@@ -389,23 +517,36 @@ export default function TicketsPage() {
                   {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                 </select>
 
-                <div className="flex items-center gap-2 text-[13px] text-zinc-500 ml-auto">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  {format(new Date(ticket.createdAt), 'd MMM yyyy', { locale: it })}
-                </div>
+                {ticket.dueDate && (
+                  <div className="flex items-center gap-2 text-[13px] text-zinc-500">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Scadenza: {format(new Date(ticket.dueDate), 'd MMM', { locale: it })}
+                  </div>
+                )}
               </div>
 
-              {/* Author */}
-              <div className="flex items-center gap-3">
-                <div className="avatar w-9 h-9 rounded-xl text-[13px] shrink-0">
-                  {ticket.author?.name?.charAt(0).toUpperCase()}
+              {/* Footer */}
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="avatar w-9 h-9 rounded-xl text-[13px] shrink-0">
+                    {ticket.author?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[13px] text-zinc-500">Creato da</p>
+                    <p className="text-[14px] text-white font-medium truncate">{ticket.author?.name}</p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-[13px] text-zinc-500">Creato da</p>
-                  <p className="text-[14px] text-white font-medium truncate">{ticket.author?.name}</p>
-                </div>
+
+                {ticket.assignee && (
+                  <div className="flex items-center gap-2 text-[13px] text-zinc-400">
+                    <span>→</span>
+                    <div className="avatar w-8 h-8 rounded-lg text-[12px]">
+                      {ticket.assignee.name?.charAt(0).toUpperCase()}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -415,36 +556,168 @@ export default function TicketsPage() {
       {/* Modal */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal max-w-4xl" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2 className="modal-title">{editingTicket ? 'Modifica ticket' : 'Crea nuovo ticket'}</h2>
-              <p className="text-[14px] text-zinc-500 mt-2">Compila tutti i campi necessari per il ticket</p>
+              <p className="text-[14px] text-zinc-500 mt-2">Compila tutti i campi necessari per gestire il ticket</p>
             </div>
             <div className="modal-body space-y-6">
+              {/* Title */}
               <div>
-                <label className="label">Titolo del ticket *</label>
+                <label className="label required">Titolo del ticket</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="input"
+                  className="input w-full"
                   placeholder="es. Problema con il login"
                   autoFocus
+                  required
                 />
               </div>
 
+              {/* Description */}
               <div>
                 <label className="label">Descrizione dettagliata</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="input"
-                  rows={5}
+                  className="input w-full min-h-[100px] resize-none"
                   placeholder="Descrivi il problema o la richiesta in modo dettagliato..."
                 />
-                <p className="text-[13px] text-zinc-500 mt-2">Una descrizione chiara aiuta a risolvere il ticket più velocemente</p>
               </div>
 
+              {/* Client & Category Row */}
+              <div className="grid grid-cols-2 gap-6">
+                {/* Client */}
+                <div>
+                  <label className="label">Cliente</label>
+                  {!showNewClientForm ? (
+                    <div className="space-y-2">
+                      <select
+                        value={formData.clientId}
+                        onChange={(e) => {
+                          if (e.target.value === '__new__') {
+                            setShowNewClientForm(true);
+                          } else {
+                            setFormData({ ...formData, clientId: e.target.value });
+                          }
+                        }}
+                        className="input w-full"
+                      >
+                        <option value="">Nessun cliente</option>
+                        {clients.map(client => (
+                          <option key={client.id} value={client.id}>{client.name}</option>
+                        ))}
+                        <option value="__new__">+ Aggiungi nuovo cliente</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newClientName}
+                        onChange={(e) => setNewClientName(e.target.value)}
+                        className="input flex-1"
+                        placeholder="Nome nuovo cliente"
+                        onKeyDown={(e) => e.key === 'Enter' && handleCreateClient()}
+                      />
+                      <button onClick={handleCreateClient} className="btn btn-glow px-4">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </button>
+                      <button onClick={() => { setShowNewClientForm(false); setNewClientName(''); }} className="btn px-4">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="label">Categoria</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="input w-full"
+                  >
+                    <option value="">Seleziona categoria</option>
+                    {categoryOptions.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Assignee & Due Date Row */}
+              <div className="grid grid-cols-2 gap-6">
+                {/* Assignee */}
+                <div>
+                  <label className="label">Assegnato a</label>
+                  <select
+                    value={formData.assigneeId}
+                    onChange={(e) => setFormData({ ...formData, assigneeId: e.target.value })}
+                    className="input w-full"
+                  >
+                    <option value="">Non assegnato</option>
+                    {teamMembers.map(member => (
+                      <option key={member.id} value={member.id}>{member.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Due Date */}
+                <div>
+                  <label className="label">Data scadenza</label>
+                  <input
+                    type="date"
+                    value={formData.dueDate}
+                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                    className="input w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className="label">Tags</label>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Aggiungi tag e premi Enter"
+                      className="input flex-1"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          addTag((e.target as HTMLInputElement).value);
+                          (e.target as HTMLInputElement).value = '';
+                        }
+                      }}
+                    />
+                  </div>
+                  {formData.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.tags.map((tag, idx) => (
+                        <span key={idx} className="badge badge-blue flex items-center gap-2">
+                          {tag}
+                          <button
+                            onClick={() => removeTag(tag)}
+                            className="hover:text-red-400 transition-colors"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Priority & Status */}
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="label">Priorità</label>
@@ -464,7 +737,7 @@ export default function TicketsPage() {
                 </div>
 
                 <div>
-                  <label className="label">Stato iniziale</label>
+                  <label className="label">Stato</label>
                   <div className="grid grid-cols-2 gap-2">
                     {statusOptions.slice(0, 2).map((opt) => (
                       <button
@@ -488,7 +761,7 @@ export default function TicketsPage() {
               <button
                 onClick={editingTicket ? handleUpdateTicket : handleCreateTicket}
                 disabled={!formData.name.trim() || isSubmitting}
-                className="btn btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                className="btn btn-glow disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">
