@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -23,17 +22,19 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (result?.error) {
-        setError('Credenziali non valide');
-      } else {
+      const data = await res.json();
+
+      if (data.success) {
         router.push('/notes');
         router.refresh();
+      } else {
+        setError('Credenziali non valide');
       }
     } catch {
       setError('Si è verificato un errore');
