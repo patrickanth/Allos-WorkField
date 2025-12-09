@@ -26,7 +26,6 @@ type NoteWithAuthor = Note & { author?: { id: string; name: string; avatar: stri
 
 export default function NotesPage() {
   const searchParams = useSearchParams();
-  // Hardcoded session
   const session = { user: { id: 'admin-patrick', name: 'Patrick', teamId: 'team-default' } };
   const view = searchParams.get('view') || 'private';
 
@@ -52,7 +51,6 @@ export default function NotesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
-  // Categories from notes
   const categories = useMemo(() => {
     const cats = new Set(notes.map(n => n.category).filter(Boolean) as string[]);
     return Array.from(cats);
@@ -212,11 +210,9 @@ export default function NotesPage() {
     });
   };
 
-  // Filter and sort notes
   const filteredNotes = useMemo(() => {
     let result = [...notes];
 
-    // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(note =>
@@ -226,24 +222,19 @@ export default function NotesPage() {
       );
     }
 
-    // Category filter
     if (selectedCategory !== 'all') {
       result = result.filter(note => note.category === selectedCategory);
     }
 
-    // Color filter
     if (selectedColor !== 'all') {
       result = result.filter(note => note.color === selectedColor);
     }
 
-    // Pinned only
     if (showPinnedOnly) {
       result = result.filter(note => note.isPinned);
     }
 
-    // Sort
     result.sort((a, b) => {
-      // Pinned always first
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
 
@@ -262,10 +253,10 @@ export default function NotesPage() {
   return (
     <div className="page">
       {/* Header */}
-      <div className="page-header flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
         <div>
-          <h1 className="page-title">{view === 'private' ? 'Note Private' : 'Note del Team'}</h1>
-          <p className="page-subtitle">
+          <h1 className="text-2xl font-bold text-white mb-2">{view === 'private' ? 'Note Private' : 'Note del Team'}</h1>
+          <p className="text-sm text-zinc-500">
             {view === 'private'
               ? 'Le tue annotazioni personali e private'
               : canShare
@@ -274,76 +265,94 @@ export default function NotesPage() {
             }
           </p>
         </div>
-        <button onClick={openCreateModal} className="btn btn-primary shrink-0 self-start">
+        <button onClick={openCreateModal} className="btn btn-primary shrink-0">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          <span className="hidden sm:inline">Nuova nota</span>
-          <span className="sm:hidden">Nuova</span>
+          Nuova nota
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="mb-8 space-y-4">
-        {/* Search */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1 max-w-lg">
-            <svg className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Cerca nelle note..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="input pl-14"
-            />
-          </div>
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Cerca nelle note..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="input pl-12 w-full"
+          />
+        </div>
+      </div>
 
-          {/* Filter toggles */}
-          <div className="flex items-center gap-3 flex-wrap">
-            {categories.length > 0 && (
+      {/* Filters - Well Spaced */}
+      <div className="card p-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Category Filter */}
+          {categories.length > 0 && (
+            <div>
+              <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2 font-medium">Categoria</label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="input py-3 px-4 min-w-[140px]"
+                className="input w-full"
               >
                 <option value="all">Tutte le categorie</option>
                 {categories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
-            )}
+            </div>
+          )}
 
+          {/* Color Filter */}
+          <div>
+            <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2 font-medium">Colore</label>
             <select
               value={selectedColor}
               onChange={(e) => setSelectedColor(e.target.value as NoteColor | 'all')}
-              className="input py-3 px-4 min-w-[120px]"
+              className="input w-full"
             >
               <option value="all">Tutti i colori</option>
               {colorOptions.map(c => (
                 <option key={c.value} value={c.value}>{c.label}</option>
               ))}
             </select>
+          </div>
 
+          {/* Sort By */}
+          <div>
+            <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2 font-medium">Ordina per</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'date' | 'title')}
+              className="input w-full"
+            >
+              <option value="date">Data creazione</option>
+              <option value="title">Titolo</option>
+            </select>
+          </div>
+
+          {/* Pinned Toggle */}
+          <div>
+            <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2 font-medium">Fissate</label>
             <button
               onClick={() => setShowPinnedOnly(!showPinnedOnly)}
-              className={`btn ${showPinnedOnly ? 'btn-glow' : 'btn-secondary'} py-3`}
+              className={`w-full flex items-center justify-center gap-2 h-[46px] rounded-xl font-medium transition-all ${
+                showPinnedOnly
+                  ? 'bg-amber-500/20 border border-amber-500/50 text-amber-400'
+                  : 'bg-zinc-800/50 border border-zinc-700/50 text-zinc-400 hover:text-white hover:border-zinc-600'
+              }`}
             >
               <svg className="w-4 h-4" fill={showPinnedOnly ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
               </svg>
-              <span className="hidden sm:inline">Fissate ({pinnedCount})</span>
+              <span>Fissate ({pinnedCount})</span>
             </button>
-
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'date' | 'title')}
-              className="input py-3 px-4 min-w-[130px]"
-            >
-              <option value="date">Per data</option>
-              <option value="title">Per titolo</option>
-            </select>
           </div>
         </div>
       </div>
@@ -352,9 +361,9 @@ export default function NotesPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="card p-8">
-              <div className="skeleton h-6 w-24 mb-6" />
-              <div className="space-y-3">
+            <div key={i} className="card p-6">
+              <div className="skeleton h-5 w-20 mb-4" />
+              <div className="space-y-2">
                 <div className="skeleton h-4 w-full" />
                 <div className="skeleton h-4 w-3/4" />
                 <div className="skeleton h-4 w-1/2" />
@@ -364,16 +373,16 @@ export default function NotesPage() {
         </div>
       ) : filteredNotes.length === 0 ? (
         <div className="card">
-          <div className="empty-state">
-            <div className="empty-icon">
-              <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="text-center py-16">
+            <div className="w-16 h-16 rounded-2xl bg-zinc-800/50 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <p className="empty-title">{searchQuery ? 'Nessun risultato trovato' : 'Nessuna nota presente'}</p>
-            <p className="empty-text">{searchQuery ? 'Prova a modificare la tua ricerca' : 'Crea la tua prima nota per iniziare'}</p>
+            <p className="text-lg font-medium text-white mb-2">{searchQuery ? 'Nessun risultato trovato' : 'Nessuna nota presente'}</p>
+            <p className="text-sm text-zinc-500 mb-8">{searchQuery ? 'Prova a modificare la tua ricerca' : 'Crea la tua prima nota per iniziare'}</p>
             {!searchQuery && (
-              <button onClick={openCreateModal} className="btn btn-glow mt-8">
+              <button onClick={openCreateModal} className="btn btn-primary">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -483,15 +492,15 @@ export default function NotesPage() {
                 )}
 
                 {/* Content */}
-                <p className="text-[15px] text-zinc-300 whitespace-pre-wrap line-clamp-4 mb-6 leading-relaxed">
+                <p className="text-sm text-zinc-300 whitespace-pre-wrap line-clamp-4 mb-4 leading-relaxed">
                   {note.content}
                 </p>
 
                 {/* Tags */}
                 {note.tags && note.tags.length > 0 && (
-                  <div className="flex gap-2 flex-wrap mb-6">
+                  <div className="flex gap-2 flex-wrap mb-4">
                     {note.tags.map((tag) => (
-                      <span key={tag} className="text-xs text-zinc-500 bg-white/[0.05] px-2.5 py-1 rounded-lg">
+                      <span key={tag} className="text-xs text-zinc-500 bg-white/[0.05] px-2 py-1 rounded-lg">
                         #{tag}
                       </span>
                     ))}
@@ -501,12 +510,12 @@ export default function NotesPage() {
                 {/* Footer */}
                 <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/[0.06]">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="avatar w-8 h-8 rounded-lg text-[12px] shrink-0">
+                    <div className="avatar w-8 h-8 rounded-lg text-xs shrink-0">
                       {note.author?.name?.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-[14px] text-zinc-400 font-medium truncate">{note.author?.name}</span>
+                    <span className="text-sm text-zinc-400 font-medium truncate">{note.author?.name}</span>
                   </div>
-                  <span className="text-[12px] text-zinc-600 shrink-0 whitespace-nowrap">
+                  <span className="text-xs text-zinc-600 shrink-0 whitespace-nowrap">
                     {formatDistanceToNow(new Date(note.timestamp), { addSuffix: true, locale: it })}
                   </span>
                 </div>
@@ -522,6 +531,11 @@ export default function NotesPage() {
           <div className="modal max-w-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2 className="modal-title">{editingNote ? 'Modifica nota' : 'Crea nuova nota'}</h2>
+              <button onClick={() => { setIsModalOpen(false); resetForm(); }} className="p-2 rounded-lg text-zinc-500 hover:text-white hover:bg-white/10">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
             <div className="modal-body space-y-6">
               {/* Title */}
@@ -543,14 +557,14 @@ export default function NotesPage() {
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   placeholder="Scrivi qui la tua nota..."
-                  className="input"
+                  className="input min-h-[150px]"
                   rows={6}
                   autoFocus
                 />
               </div>
 
               {/* Category and Tags */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-6">
                 <div>
                   <label className="label">Categoria</label>
                   <input
@@ -580,7 +594,7 @@ export default function NotesPage() {
               {/* Color */}
               <div>
                 <label className="label">Colore</label>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-3 flex-wrap">
                   {colorOptions.map((color) => (
                     <button
                       key={color.value}
@@ -602,7 +616,7 @@ export default function NotesPage() {
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, isPrivate: true })}
-                    className={`btn flex-1 ${formData.isPrivate ? 'btn-glow' : 'btn-secondary'}`}
+                    className={`btn flex-1 ${formData.isPrivate ? 'btn-primary' : 'btn-secondary'}`}
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -613,7 +627,7 @@ export default function NotesPage() {
                     type="button"
                     onClick={() => canShare && setFormData({ ...formData, isPrivate: false })}
                     disabled={!canShare}
-                    className={`btn flex-1 ${!formData.isPrivate ? 'btn-glow' : 'btn-secondary'} disabled:opacity-40 disabled:cursor-not-allowed`}
+                    className={`btn flex-1 ${!formData.isPrivate ? 'btn-primary' : 'btn-secondary'} disabled:opacity-40 disabled:cursor-not-allowed`}
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -622,7 +636,7 @@ export default function NotesPage() {
                   </button>
                 </div>
                 {!canShare && (
-                  <p className="text-[13px] text-amber-400 mt-4 flex items-center gap-2">
+                  <p className="text-sm text-amber-400 mt-4 flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
