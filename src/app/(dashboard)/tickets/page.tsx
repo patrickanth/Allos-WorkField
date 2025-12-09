@@ -365,7 +365,7 @@ export default function TicketsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+      <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-6">
         <div className="stat-card">
           <p className="stat-label">Totali</p>
           <p className="stat-value">{stats.total}</p>
@@ -388,7 +388,7 @@ export default function TicketsPage() {
         </div>
         <button
           onClick={() => setShowOverdueOnly(!showOverdueOnly)}
-          className={`stat-card cursor-pointer transition-all ${showOverdueOnly ? 'ring-2 ring-red-500' : ''} ${stats.overdue > 0 ? 'border-red-500/30' : ''}`}
+          className={`stat-card text-left cursor-pointer ${showOverdueOnly ? 'ring-2 ring-red-500' : ''} ${stats.overdue > 0 ? 'border-red-500/30' : ''}`}
         >
           <p className="stat-label text-red-400">In Ritardo</p>
           <p className="stat-value text-red-400">{stats.overdue}</p>
@@ -396,51 +396,49 @@ export default function TicketsPage() {
       </div>
 
       {/* Filters */}
-      <div className="mb-8 space-y-4">
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="relative flex-1 max-w-md">
-            <svg className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="card p-4 mb-6">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[200px] max-w-sm">
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               type="text"
-              placeholder="Cerca nei ticket..."
+              placeholder="Cerca..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="input pl-14"
+              className="input input-sm pl-10 w-full"
             />
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap">
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as TicketStatus | 'all')} className="input py-3 px-4 min-w-[120px]">
-              <option value="all">Tutti gli stati</option>
-              {statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-            </select>
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as TicketStatus | 'all')} className="input input-sm w-auto min-w-[130px]">
+            <option value="all">Tutti gli stati</option>
+            {statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
 
-            <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value as TicketPriority | 'all')} className="input py-3 px-4 min-w-[120px]">
-              <option value="all">Tutte le priorita</option>
-              {priorityOptions.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-            </select>
+          <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value as TicketPriority | 'all')} className="input input-sm w-auto min-w-[130px]">
+            <option value="all">Tutte le priorità</option>
+            {priorityOptions.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+          </select>
 
-            <select value={assigneeFilter} onChange={(e) => setAssigneeFilter(e.target.value)} className="input py-3 px-4 min-w-[140px]">
-              <option value="all">Tutti</option>
-              <option value="unassigned">Non assegnati</option>
-              {teamMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-            </select>
+          <select value={assigneeFilter} onChange={(e) => setAssigneeFilter(e.target.value)} className="input input-sm w-auto min-w-[120px]">
+            <option value="all">Tutti</option>
+            <option value="unassigned">Non assegnati</option>
+            {teamMembers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+          </select>
 
-            {categories.length > 0 && (
-              <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="input py-3 px-4 min-w-[120px]">
-                <option value="all">Categorie</option>
-                {categories.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            )}
-
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value as 'date' | 'priority' | 'dueDate')} className="input py-3 px-4 min-w-[130px]">
-              <option value="date">Per data</option>
-              <option value="priority">Per priorita</option>
-              <option value="dueDate">Per scadenza</option>
+          {categories.length > 0 && (
+            <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="input input-sm w-auto min-w-[120px]">
+              <option value="all">Categorie</option>
+              {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-          </div>
+          )}
+
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value as 'date' | 'priority' | 'dueDate')} className="input input-sm w-auto min-w-[120px]">
+            <option value="date">Per data</option>
+            <option value="priority">Per priorità</option>
+            <option value="dueDate">Per scadenza</option>
+          </select>
         </div>
       </div>
 

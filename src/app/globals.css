@@ -84,8 +84,8 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 24px;
-  padding: 32px;
+  border-radius: 16px;
+  padding: 24px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
@@ -125,16 +125,23 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 16px 32px;
-  font-size: 14px;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
   font-weight: 600;
-  border-radius: 16px;
+  border-radius: 12px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: none;
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
+}
+
+.btn-lg {
+  padding: 14px 28px;
+  font-size: 14px;
+  border-radius: 14px;
 }
 
 .btn::before {
@@ -229,14 +236,20 @@ body {
 
 .input {
   width: 100%;
-  padding: 18px 24px;
-  font-size: 15px;
+  padding: 12px 16px;
+  font-size: 14px;
   background: rgba(24, 24, 27, 0.6);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: 12px;
   color: #fafafa;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-sm {
+  padding: 10px 14px;
+  font-size: 13px;
+  border-radius: 10px;
 }
 
 .input:focus {
@@ -505,8 +518,8 @@ select.input {
 
 .table th {
   text-align: left;
-  padding: 22px 28px;
-  font-size: 12px;
+  padding: 14px 20px;
+  font-size: 11px;
   font-weight: 600;
   color: #71717a;
   text-transform: uppercase;
@@ -516,7 +529,7 @@ select.input {
 }
 
 .table td {
-  padding: 24px 28px;
+  padding: 16px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   vertical-align: middle;
 }
@@ -572,8 +585,8 @@ select.input {
   background: rgba(24, 24, 27, 0.6);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 24px;
-  padding: 32px;
+  border-radius: 16px;
+  padding: 20px 24px;
   transition: all 0.3s ease;
 }
 
@@ -583,8 +596,8 @@ select.input {
 }
 
 .stat-label {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
   color: #71717a;
   margin-bottom: 8px;
   text-transform: uppercase;
@@ -592,7 +605,7 @@ select.input {
 }
 
 .stat-value {
-  font-size: 42px;
+  font-size: 28px;
   font-weight: 700;
   color: #fafafa;
   letter-spacing: -0.03em;
@@ -600,7 +613,7 @@ select.input {
 }
 
 .stat-value-small {
-  font-size: 28px;
+  font-size: 22px;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -608,7 +621,7 @@ select.input {
    ───────────────────────────────────────────────────────────────────────────── */
 
 .page {
-  padding: 56px 96px;
+  padding: 32px 48px;
   max-width: 1600px;
   margin: 0 auto;
   position: relative;
@@ -617,64 +630,64 @@ select.input {
 
 @media (max-width: 1536px) {
   .page {
-    padding: 52px 80px;
+    padding: 28px 40px;
     max-width: 1400px;
   }
 }
 
 @media (max-width: 1280px) {
   .page {
-    padding: 48px 64px;
+    padding: 24px 32px;
     max-width: 1200px;
   }
 }
 
 @media (max-width: 1024px) {
   .page {
-    padding: 40px 48px;
+    padding: 20px 24px;
   }
 }
 
 @media (max-width: 768px) {
   .page {
-    padding: 32px 24px;
+    padding: 16px 16px;
   }
 }
 
 .page-header {
-  margin-bottom: 56px;
+  margin-bottom: 32px;
 }
 
 @media (max-width: 768px) {
   .page-header {
-    margin-bottom: 40px;
+    margin-bottom: 24px;
   }
 }
 
 .page-title {
-  font-size: 36px;
+  font-size: 26px;
   font-weight: 700;
   color: #fafafa;
-  margin-bottom: 14px;
-  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
 @media (max-width: 768px) {
   .page-title {
-    font-size: 28px;
+    font-size: 22px;
   }
 }
 
 .page-subtitle {
-  font-size: 16px;
+  font-size: 14px;
   color: #71717a;
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 @media (max-width: 768px) {
   .page-subtitle {
-    font-size: 14px;
+    font-size: 13px;
   }
 }
 
