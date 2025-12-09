@@ -315,35 +315,35 @@ export default function TicketsPage() {
       </div>
 
       {/* Stats Cards - Horizontal Layout */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-        <div className="card p-4">
-          <p className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Totali</p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 mb-10">
+        <div className="card p-5">
+          <p className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Totali</p>
           <p className="text-2xl font-bold text-white">{stats.total}</p>
         </div>
-        <div className="card p-4 border-blue-500/20">
-          <p className="text-xs text-blue-400 uppercase tracking-wider mb-1">Aperti</p>
+        <div className="card p-5 border-blue-500/20">
+          <p className="text-xs text-blue-400 uppercase tracking-wider mb-2">Aperti</p>
           <p className="text-2xl font-bold text-blue-400">{stats.open}</p>
         </div>
-        <div className="card p-4 border-amber-500/20">
-          <p className="text-xs text-amber-400 uppercase tracking-wider mb-1">In Corso</p>
+        <div className="card p-5 border-amber-500/20">
+          <p className="text-xs text-amber-400 uppercase tracking-wider mb-2">In Corso</p>
           <p className="text-2xl font-bold text-amber-400">{stats.inProgress}</p>
         </div>
-        <div className="card p-4 border-emerald-500/20">
-          <p className="text-xs text-emerald-400 uppercase tracking-wider mb-1">Risolti</p>
+        <div className="card p-5 border-emerald-500/20">
+          <p className="text-xs text-emerald-400 uppercase tracking-wider mb-2">Risolti</p>
           <p className="text-2xl font-bold text-emerald-400">{stats.resolved}</p>
         </div>
-        <div className="card p-4 border-red-500/20">
-          <p className="text-xs text-red-400 uppercase tracking-wider mb-1">Critici</p>
+        <div className="card p-5 border-red-500/20">
+          <p className="text-xs text-red-400 uppercase tracking-wider mb-2">Critici</p>
           <p className="text-2xl font-bold text-red-400">{stats.critical}</p>
         </div>
-        <div className="card p-4 border-red-500/20">
-          <p className="text-xs text-red-400 uppercase tracking-wider mb-1">In Ritardo</p>
+        <div className="card p-5 border-red-500/20">
+          <p className="text-xs text-red-400 uppercase tracking-wider mb-2">In Ritardo</p>
           <p className="text-2xl font-bold text-red-400">{stats.overdue}</p>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="card p-6 mb-8">
+      <div className="card p-6 mb-10">
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative max-w-md">
@@ -361,7 +361,7 @@ export default function TicketsPage() {
         </div>
 
         {/* Filter Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Status Filter */}
           <div>
             <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2 font-medium">Stato</label>

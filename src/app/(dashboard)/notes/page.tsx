@@ -290,8 +290,8 @@ export default function NotesPage() {
       </div>
 
       {/* Filters - Well Spaced */}
-      <div className="card p-6 mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="card p-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Category Filter */}
           {categories.length > 0 && (
             <div>
@@ -359,7 +359,7 @@ export default function NotesPage() {
 
       {/* Content */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="card p-6">
               <div className="skeleton h-5 w-20 mb-4" />
@@ -392,7 +392,7 @@ export default function NotesPage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
           {filteredNotes.map((note) => {
             const colorClasses = getColorClasses(note.color || 'default');
             return (

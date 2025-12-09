@@ -669,34 +669,35 @@ export default function ProjectMapsPage() {
 
       {/* New Map Modal */}
       {showNewMapModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowNewMapModal(false)}>
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-white mb-6">Nuova Mappa Progetto</h2>
-            <div className="space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/85 backdrop-blur-md" onClick={() => setShowNewMapModal(false)}>
+          <div className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-white/10 rounded-3xl p-8 w-full max-w-md shadow-2xl shadow-cyan-500/10" onClick={e => e.stopPropagation()}>
+            <h2 className="text-xl font-bold text-white mb-2">Nuova Mappa Progetto</h2>
+            <p className="text-sm text-zinc-500 mb-8">Crea un nuovo spazio di lavoro visuale</p>
+            <div className="space-y-6">
               <div>
-                <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Nome Mappa *</label>
+                <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Nome Mappa *</label>
                 <input
                   type="text"
                   value={newMapName}
                   onChange={(e) => setNewMapName(e.target.value)}
                   placeholder="Es: Piano di Sviluppo Q1"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500/50"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Descrizione</label>
+                <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Descrizione</label>
                 <textarea
                   value={newMapDescription}
                   onChange={(e) => setNewMapDescription(e.target.value)}
                   placeholder="Descrivi lo scopo di questa mappa..."
-                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500/50 min-h-[80px]"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all min-h-[100px] resize-none"
                 />
               </div>
             </div>
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setShowNewMapModal(false)} className="flex-1 py-3 bg-white/5 border border-white/10 rounded-xl text-zinc-400 hover:text-white transition-all">Annulla</button>
-              <button onClick={createNewMap} disabled={!newMapName.trim()} className="flex-1 py-3 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-xl text-white font-medium hover:opacity-90 transition-all disabled:opacity-40">Crea Mappa</button>
+            <div className="flex gap-4 mt-8">
+              <button onClick={() => setShowNewMapModal(false)} className="flex-1 py-3.5 bg-white/5 border border-white/10 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-all font-medium">Annulla</button>
+              <button onClick={createNewMap} disabled={!newMapName.trim()} className="flex-1 py-3.5 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-xl text-white font-medium hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/25">Crea Mappa</button>
             </div>
           </div>
         </div>
@@ -704,76 +705,77 @@ export default function ProjectMapsPage() {
 
       {/* Node Edit Modal */}
       {showNodeModal && selectedNode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowNodeModal(false)}>
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b border-white/10">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-white">Modifica Nodo</h2>
-                <button onClick={() => setShowNodeModal(false)} className="p-2 text-zinc-500 hover:text-white">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/85 backdrop-blur-md" onClick={() => setShowNodeModal(false)}>
+          <div className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-white/10 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden shadow-2xl shadow-cyan-500/10" onClick={e => e.stopPropagation()}>
+            <div className="px-8 py-6 border-b border-white/10 flex items-center justify-between bg-zinc-900/80">
+              <div>
+                <h2 className="text-xl font-bold text-white mb-1">Modifica Nodo</h2>
+                <p className="text-sm text-zinc-500">Configura le proprietà del nodo</p>
               </div>
+              <button onClick={() => setShowNodeModal(false)} className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/10 transition-all">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
             </div>
-            <div className="p-6 space-y-5">
+            <div className="px-8 py-6 space-y-6 overflow-y-auto max-h-[calc(90vh-180px)]">
               <div>
-                <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Titolo *</label>
-                <input type="text" value={nodeForm.title} onChange={(e) => setNodeForm({ ...nodeForm, title: e.target.value })} placeholder="Nome del nodo" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500/50" />
+                <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Titolo *</label>
+                <input type="text" value={nodeForm.title} onChange={(e) => setNodeForm({ ...nodeForm, title: e.target.value })} placeholder="Nome del nodo" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all" />
               </div>
               <div>
-                <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Descrizione</label>
-                <textarea value={nodeForm.description} onChange={(e) => setNodeForm({ ...nodeForm, description: e.target.value })} placeholder="Descrivi questo elemento..." className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500/50 min-h-[80px]" />
+                <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Descrizione</label>
+                <textarea value={nodeForm.description} onChange={(e) => setNodeForm({ ...nodeForm, description: e.target.value })} placeholder="Descrivi questo elemento..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all min-h-[100px] resize-none" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Tipo</label>
-                  <select value={nodeForm.type} onChange={(e) => setNodeForm({ ...nodeForm, type: e.target.value as ProjectNode['type'] })} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500/50">
-                    {Object.entries(typeLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                  <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Tipo</label>
+                  <select value={nodeForm.type} onChange={(e) => setNodeForm({ ...nodeForm, type: e.target.value as ProjectNode['type'] })} className="w-full bg-zinc-800 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+                    {Object.entries(typeLabels).map(([value, label]) => <option key={value} value={value} className="bg-zinc-800">{label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Stato</label>
-                  <select value={nodeForm.status} onChange={(e) => setNodeForm({ ...nodeForm, status: e.target.value as ProjectNode['status'] })} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500/50">
-                    {Object.entries(statusColors).map(([value, { label }]) => <option key={value} value={value}>{label}</option>)}
+                  <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Stato</label>
+                  <select value={nodeForm.status} onChange={(e) => setNodeForm({ ...nodeForm, status: e.target.value as ProjectNode['status'] })} className="w-full bg-zinc-800 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+                    {Object.entries(statusColors).map(([value, { label }]) => <option key={value} value={value} className="bg-zinc-800">{label}</option>)}
                   </select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Priorità</label>
-                  <select value={nodeForm.priority} onChange={(e) => setNodeForm({ ...nodeForm, priority: e.target.value as ProjectNode['priority'] })} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500/50">
-                    {Object.entries(priorityLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                  <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Priorità</label>
+                  <select value={nodeForm.priority} onChange={(e) => setNodeForm({ ...nodeForm, priority: e.target.value as ProjectNode['priority'] })} className="w-full bg-zinc-800 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+                    {Object.entries(priorityLabels).map(([value, label]) => <option key={value} value={value} className="bg-zinc-800">{label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Progresso: {nodeForm.progress}%</label>
-                  <input type="range" min="0" max="100" value={nodeForm.progress} onChange={(e) => setNodeForm({ ...nodeForm, progress: parseInt(e.target.value) })} className="w-full accent-cyan-500 mt-2" />
+                  <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Progresso: {nodeForm.progress}%</label>
+                  <input type="range" min="0" max="100" value={nodeForm.progress} onChange={(e) => setNodeForm({ ...nodeForm, progress: parseInt(e.target.value) })} className="w-full accent-cyan-500 mt-3 h-2" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Scadenza</label>
-                  <input type="date" value={nodeForm.dueDate} onChange={(e) => setNodeForm({ ...nodeForm, dueDate: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500/50" />
+                  <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Scadenza</label>
+                  <input type="date" value={nodeForm.dueDate} onChange={(e) => setNodeForm({ ...nodeForm, dueDate: e.target.value })} className="w-full bg-zinc-800 border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-cyan-500/50 transition-all" />
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Assegnato a</label>
-                  <input type="text" value={nodeForm.assignee} onChange={(e) => setNodeForm({ ...nodeForm, assignee: e.target.value })} placeholder="Nome persona" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500/50" />
+                  <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Assegnato a</label>
+                  <input type="text" value={nodeForm.assignee} onChange={(e) => setNodeForm({ ...nodeForm, assignee: e.target.value })} placeholder="Nome persona" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all" />
                 </div>
               </div>
 
               {/* Connections */}
               {selectedNode.connections.length > 0 && (
                 <div>
-                  <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Connessioni ({selectedNode.connections.length})</label>
-                  <div className="space-y-2">
+                  <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Connessioni ({selectedNode.connections.length})</label>
+                  <div className="space-y-2.5">
                     {selectedNode.connections.map(conn => {
                       const target = nodes.find(n => n.id === conn.targetId);
                       return (
-                        <div key={conn.targetId} className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
+                        <div key={conn.targetId} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
                           <div>
-                            <span className="text-sm text-white">{target?.title || 'Nodo'}</span>
-                            {conn.label && <span className="text-xs text-cyan-400 ml-2">({conn.label})</span>}
+                            <span className="text-sm text-white font-medium">{target?.title || 'Nodo'}</span>
+                            {conn.label && <span className="text-xs text-cyan-400 ml-3 px-2 py-0.5 bg-cyan-500/10 rounded-lg">({conn.label})</span>}
                           </div>
-                          <button onClick={() => removeConnection(selectedNode.id, conn.targetId)} className="text-red-400 hover:text-red-300">
+                          <button onClick={() => removeConnection(selectedNode.id, conn.targetId)} className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                           </button>
                         </div>
@@ -783,11 +785,11 @@ export default function ProjectMapsPage() {
                 </div>
               )}
             </div>
-            <div className="p-6 border-t border-white/10 flex gap-3">
-              <button onClick={() => deleteNode(selectedNode.id)} className="py-3 px-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 hover:bg-red-500/20">Elimina</button>
+            <div className="px-8 py-5 border-t border-white/10 flex gap-4 bg-zinc-900/50">
+              <button onClick={() => deleteNode(selectedNode.id)} className="py-3 px-5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 hover:bg-red-500/20 transition-all font-medium">Elimina</button>
               <div className="flex-1" />
-              <button onClick={() => setShowNodeModal(false)} className="py-3 px-6 bg-white/5 border border-white/10 rounded-xl text-zinc-400 hover:text-white">Annulla</button>
-              <button onClick={saveNodeChanges} className="py-3 px-6 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-xl text-white font-medium hover:opacity-90">Salva</button>
+              <button onClick={() => setShowNodeModal(false)} className="py-3 px-6 bg-white/5 border border-white/10 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-all font-medium">Annulla</button>
+              <button onClick={saveNodeChanges} className="py-3 px-6 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-xl text-white font-medium hover:opacity-90 transition-all shadow-lg shadow-cyan-500/25">Salva</button>
             </div>
           </div>
         </div>
@@ -795,28 +797,32 @@ export default function ProjectMapsPage() {
 
       {/* Connection Label Modal */}
       {showConnectionModal && pendingConnection && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => { setShowConnectionModal(false); setPendingConnection(null); }}>
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
-            <h2 className="text-lg font-bold text-white mb-4">Nuova Connessione</h2>
-            <p className="text-sm text-zinc-400 mb-4">
-              Da: <span className="text-cyan-400">{nodes.find(n => n.id === pendingConnection.fromId)?.title || 'Nodo'}</span>
-              <br />
-              A: <span className="text-violet-400">{nodes.find(n => n.id === pendingConnection.toId)?.title || 'Nodo'}</span>
-            </p>
-            <div className="mb-6">
-              <label className="block text-xs text-zinc-500 uppercase tracking-wider mb-2">Etichetta (opzionale)</label>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/85 backdrop-blur-md" onClick={() => { setShowConnectionModal(false); setPendingConnection(null); }}>
+          <div className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-white/10 rounded-3xl p-8 w-full max-w-sm shadow-2xl shadow-cyan-500/10" onClick={e => e.stopPropagation()}>
+            <h2 className="text-xl font-bold text-white mb-2">Nuova Connessione</h2>
+            <p className="text-sm text-zinc-500 mb-6">Collega due nodi tra loro</p>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6 space-y-2">
+              <p className="text-sm text-zinc-400">
+                Da: <span className="text-cyan-400 font-medium">{nodes.find(n => n.id === pendingConnection.fromId)?.title || 'Nodo'}</span>
+              </p>
+              <p className="text-sm text-zinc-400">
+                A: <span className="text-violet-400 font-medium">{nodes.find(n => n.id === pendingConnection.toId)?.title || 'Nodo'}</span>
+              </p>
+            </div>
+            <div className="mb-8">
+              <label className="block text-xs text-zinc-400 uppercase tracking-wider mb-3 font-medium">Etichetta (opzionale)</label>
               <input
                 type="text"
                 value={connectionLabel}
                 onChange={(e) => setConnectionLabel(e.target.value)}
                 placeholder="Es: dipende da, blocca, richiede..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500/50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder:text-zinc-600 focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.08] transition-all"
                 autoFocus
               />
             </div>
-            <div className="flex gap-3">
-              <button onClick={() => { setShowConnectionModal(false); setPendingConnection(null); }} className="flex-1 py-3 bg-white/5 border border-white/10 rounded-xl text-zinc-400 hover:text-white">Annulla</button>
-              <button onClick={addConnection} className="flex-1 py-3 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-xl text-white font-medium">Connetti</button>
+            <div className="flex gap-4">
+              <button onClick={() => { setShowConnectionModal(false); setPendingConnection(null); }} className="flex-1 py-3.5 bg-white/5 border border-white/10 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-all font-medium">Annulla</button>
+              <button onClick={addConnection} className="flex-1 py-3.5 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-xl text-white font-medium hover:opacity-90 transition-all shadow-lg shadow-cyan-500/25">Connetti</button>
             </div>
           </div>
         </div>
@@ -824,59 +830,101 @@ export default function ProjectMapsPage() {
 
       {/* Tutorial Modal */}
       {showTutorial && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setShowTutorial(false)}>
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-zinc-900">
-              <h2 className="text-xl font-bold text-white">Come usare Project Maps</h2>
-              <button onClick={() => setShowTutorial(false)} className="p-2 text-zinc-500 hover:text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/85 backdrop-blur-md" onClick={() => setShowTutorial(false)}>
+          <div className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-white/10 rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden shadow-2xl shadow-cyan-500/10" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="px-8 py-6 border-b border-white/10 flex items-center justify-between bg-zinc-900/80 backdrop-blur-sm">
+              <div>
+                <h2 className="text-xl font-bold text-white mb-1">Come usare Project Maps</h2>
+                <p className="text-sm text-zinc-500">Guida rapida per iniziare</p>
+              </div>
+              <button onClick={() => setShowTutorial(false)} className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/10 transition-all">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
-            <div className="p-6 space-y-6">
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 shrink-0">1</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">Crea una Mappa</h3>
-                  <p className="text-sm text-zinc-400">Clicca sul pulsante "+" accanto al selettore mappe per creare una nuova mappa progetto. Ogni mappa rappresenta un progetto o un'area di lavoro.</p>
+
+            {/* Content */}
+            <div className="px-8 py-8 space-y-7 overflow-y-auto max-h-[calc(85vh-100px)]">
+              {/* Step 1 */}
+              <div className="flex gap-5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/30 to-cyan-600/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold shrink-0 shadow-lg shadow-cyan-500/20">1</div>
+                <div className="pt-1 flex-1">
+                  <h3 className="text-white font-semibold text-[15px] mb-2">Crea una Mappa</h3>
+                  <p className="text-[13px] text-zinc-400 leading-relaxed">Clicca sul pulsante "+" accanto al selettore mappe per creare una nuova mappa progetto. Ogni mappa rappresenta un progetto o un'area di lavoro.</p>
                 </div>
               </div>
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center text-violet-400 shrink-0">2</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">Aggiungi Nodi</h3>
-                  <p className="text-sm text-zinc-400">Usa la barra laterale per selezionare il tipo di nodo, poi clicca sulla mappa per posizionarlo. Tipi disponibili:</p>
-                  <ul className="mt-2 space-y-1 text-sm text-zinc-500">
-                    <li><span className="text-cyan-400">Core:</span> Elementi centrali del progetto</li>
-                    <li><span className="text-violet-400">Module:</span> Componenti o sottosistemi</li>
-                    <li><span className="text-emerald-400">Task:</span> Attività specifiche da completare</li>
-                    <li><span className="text-amber-400">Milestone:</span> Traguardi importanti</li>
-                    <li><span className="text-rose-400">Resource:</span> Risorse umane o materiali</li>
-                  </ul>
+
+              {/* Step 2 */}
+              <div className="flex gap-5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500/30 to-violet-600/10 border border-violet-500/30 flex items-center justify-center text-violet-400 font-bold shrink-0 shadow-lg shadow-violet-500/20">2</div>
+                <div className="pt-1 flex-1">
+                  <h3 className="text-white font-semibold text-[15px] mb-2">Aggiungi Nodi</h3>
+                  <p className="text-[13px] text-zinc-400 leading-relaxed mb-4">Usa la barra laterale per selezionare il tipo di nodo, poi clicca sulla mappa per posizionarlo:</p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                      <span className="text-[12px]"><span className="text-cyan-400 font-medium">Core:</span> <span className="text-zinc-500">Elementi centrali</span></span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-violet-500/10 border border-violet-500/20">
+                      <span className="w-2 h-2 rounded-full bg-violet-400"></span>
+                      <span className="text-[12px]"><span className="text-violet-400 font-medium">Module:</span> <span className="text-zinc-500">Sottosistemi</span></span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span className="text-[12px]"><span className="text-emerald-400 font-medium">Task:</span> <span className="text-zinc-500">Attività</span></span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                      <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                      <span className="text-[12px]"><span className="text-amber-400 font-medium">Milestone:</span> <span className="text-zinc-500">Traguardi</span></span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 col-span-2">
+                      <span className="w-2 h-2 rounded-full bg-rose-400"></span>
+                      <span className="text-[12px]"><span className="text-rose-400 font-medium">Resource:</span> <span className="text-zinc-500">Risorse umane o materiali</span></span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">3</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">Modifica i Nodi</h3>
-                  <p className="text-sm text-zinc-400">Fai doppio click su un nodo per aprire l'editor. Puoi modificare titolo, descrizione, stato, priorità, progresso, scadenza e assegnatario.</p>
+
+              {/* Step 3 */}
+              <div className="flex gap-5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/30 to-emerald-600/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold shrink-0 shadow-lg shadow-emerald-500/20">3</div>
+                <div className="pt-1 flex-1">
+                  <h3 className="text-white font-semibold text-[15px] mb-2">Modifica i Nodi</h3>
+                  <p className="text-[13px] text-zinc-400 leading-relaxed">Fai doppio click su un nodo per aprire l'editor. Puoi modificare titolo, descrizione, stato, priorità, progresso, scadenza e assegnatario.</p>
                 </div>
               </div>
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">4</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">Crea Connessioni</h3>
-                  <p className="text-sm text-zinc-400">Clicca sul pallino a destra di un nodo, poi clicca su un altro nodo per creare una connessione. Puoi aggiungere un'etichetta per descrivere la relazione (es: "dipende da", "blocca", "richiede").</p>
+
+              {/* Step 4 */}
+              <div className="flex gap-5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/30 to-amber-600/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold shrink-0 shadow-lg shadow-amber-500/20">4</div>
+                <div className="pt-1 flex-1">
+                  <h3 className="text-white font-semibold text-[15px] mb-2">Crea Connessioni</h3>
+                  <p className="text-[13px] text-zinc-400 leading-relaxed">Clicca sul pallino a destra di un nodo, poi clicca su un altro nodo per creare una connessione. Puoi aggiungere un'etichetta (es: "dipende da", "blocca", "richiede").</p>
                 </div>
               </div>
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">5</div>
-                <div>
-                  <h3 className="text-white font-semibold mb-1">Naviga la Mappa</h3>
-                  <p className="text-sm text-zinc-400">Usa la rotella del mouse per zoomare. Tieni premuto Alt + click sinistro e trascina per muovere la vista. Trascina i nodi per riposizionarli.</p>
+
+              {/* Step 5 */}
+              <div className="flex gap-5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500/30 to-rose-600/10 border border-rose-500/30 flex items-center justify-center text-rose-400 font-bold shrink-0 shadow-lg shadow-rose-500/20">5</div>
+                <div className="pt-1 flex-1">
+                  <h3 className="text-white font-semibold text-[15px] mb-2">Naviga la Mappa</h3>
+                  <p className="text-[13px] text-zinc-400 leading-relaxed">Usa la rotella del mouse per zoomare. Tieni premuto Alt + click sinistro e trascina per muovere la vista. Trascina i nodi per riposizionarli.</p>
                 </div>
               </div>
-              <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4">
-                <p className="text-sm text-cyan-400"><strong>Suggerimento:</strong> Ricorda di salvare spesso le tue modifiche cliccando sul pulsante "Salva" in alto a destra.</p>
+
+              {/* Tip */}
+              <div className="bg-gradient-to-r from-cyan-500/10 via-cyan-500/5 to-transparent border border-cyan-500/30 rounded-2xl p-5 mt-2">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-medium text-cyan-400 mb-1">Suggerimento</p>
+                    <p className="text-[13px] text-zinc-400">Ricorda di salvare spesso le tue modifiche cliccando sul pulsante "Salva" in alto a destra.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
