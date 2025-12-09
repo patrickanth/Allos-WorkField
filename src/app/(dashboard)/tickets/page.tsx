@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
+// Session removed
 import { format, formatDistanceToNow, isPast, addDays } from 'date-fns';
 import { it } from 'date-fns/locale';
 import Link from 'next/link';
@@ -29,7 +29,7 @@ const priorityOptions: { value: TicketPriority; label: string; color: string }[]
 const categoryOptions = ['Bug', 'Feature', 'Support', 'Altro'];
 
 export default function TicketsPage() {
-  const { data: session } = useSession();
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: null, role: 'admin' } };
   const [tickets, setTickets] = useState<TicketWithRelations[]>([]);
   const [teamMembers, setTeamMembers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);

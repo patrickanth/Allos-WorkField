@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import type { Note, NoteColor } from '@/types';
 
@@ -26,8 +25,9 @@ const getColorClasses = (color: NoteColor) => {
 type NoteWithAuthor = Note & { author?: { id: string; name: string; avatar: string | null } };
 
 export default function NotesPage() {
-  const { data: session } = useSession();
   const searchParams = useSearchParams();
+  // Hardcoded session
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', teamId: null } };
   const view = searchParams.get('view') || 'private';
 
   const [notes, setNotes] = useState<NoteWithAuthor[]>([]);

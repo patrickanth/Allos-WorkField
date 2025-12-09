@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+// Session removed
 import { useRouter } from 'next/navigation';
 import type { Team, User, Activity } from '@/types';
 
@@ -23,7 +23,7 @@ interface TeamMember extends User {
 }
 
 export default function TeamPage() {
-  const { data: session, update } = useSession();
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: null, role: 'admin' } }; const update = () => {};
   const router = useRouter();
   const [team, setTeam] = useState<(Team & { members?: TeamMember[] }) | null>(null);
   const [teamStats, setTeamStats] = useState<TeamStats | null>(null);

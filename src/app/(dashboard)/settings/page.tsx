@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+// Session removed
 import { useRouter } from 'next/navigation';
 
 interface UserPreferences {
@@ -13,7 +13,7 @@ interface UserPreferences {
 }
 
 export default function SettingsPage() {
-  const { data: session, update } = useSession();
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: null, role: 'admin' } }; const update = () => {};
   const router = useRouter();
 
   // Profile edit state

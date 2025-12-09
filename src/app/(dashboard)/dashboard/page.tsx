@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+// Session removed
 import Link from 'next/link';
 import { format, formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
@@ -21,7 +21,7 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: null, role: 'admin' } };
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const [recentTickets, setRecentTickets] = useState<Ticket[]>([]);

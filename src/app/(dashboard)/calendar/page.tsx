@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
+// Session removed
 
 interface CalendarEvent {
   id: string;
@@ -45,7 +45,7 @@ const eventTypes = [
 ];
 
 export default function CalendarPage() {
-  const { data: session } = useSession();
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: null, role: 'admin' } };
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [ticketDeadlines, setTicketDeadlines] = useState<TicketDeadline[]>([]);
