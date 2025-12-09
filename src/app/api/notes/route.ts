@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { notes, users } from '@/lib/storage';
+import { notes, users, activityLog } from '@/lib/storage';
+import type { NoteColor } from '@/types';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,8 +12,9 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type'); // 'private' | 'shared' | 'all'
+    const limit = searchParams.get('limit');
 
-    let result: typeof notes extends { getAll: () => infer R } ? R : never = [];
+    let result: ReturnType<typeof notes.getAll> = [];
 
     if (type === 'private') {
       result = notes.getPrivateByAuthor(session.user.id);
@@ -36,10 +38,17 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // Sort by timestamp desc
-    notesWithAuthors.sort((a, b) =>
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    );
+    // Sort: pinned first, then by timestamp desc
+    notesWithAuthors.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    });
+
+    // Apply limit if specified
+    if (limit) {
+      return NextResponse.json(notesWithAuthors.slice(0, parseInt(limit)));
+    }
 
     return NextResponse.json(notesWithAuthors);
   } catch (error) {
@@ -56,17 +65,30 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { content, isPrivate } = body;
+    const { content, title, isPrivate, color, category, tags } = body;
 
     if (!content || content.trim() === '') {
-      return NextResponse.json({ error: 'Il contenuto è obbligatorio' }, { status: 400 });
+      return NextResponse.json({ error: 'Il contenuto e obbligatorio' }, { status: 400 });
     }
 
     const newNote = notes.create({
       content: content.trim(),
+      title: title?.trim() || undefined,
       isPrivate: isPrivate ?? true,
+      color: (color as NoteColor) || 'default',
+      category: category?.trim() || undefined,
+      tags: Array.isArray(tags) ? tags.filter(Boolean) : [],
       authorId: session.user.id,
       teamId: !isPrivate && session.user.teamId ? session.user.teamId : null,
+    });
+
+    // Log activity
+    activityLog.create({
+      type: 'note_created',
+      description: `${session.user.name} ha creato una nuova nota${newNote.title ? `: ${newNote.title}` : ''}`,
+      userId: session.user.id,
+      teamId: !isPrivate && session.user.teamId ? session.user.teamId : null,
+      metadata: { noteId: newNote.id },
     });
 
     const author = users.getById(session.user.id);
