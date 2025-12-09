@@ -6,10 +6,14 @@ const ADMIN_PASSWORD = 'dev123@@';
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const body = await request.json();
+    const email = (body.email || '').trim().toLowerCase();
+    const password = (body.password || '').trim();
 
-    // Hardcoded admin check
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    console.log('LOGIN ATTEMPT:', { email, password, expected: { ADMIN_EMAIL, ADMIN_PASSWORD } });
+
+    // Hardcoded admin check (case insensitive email)
+    if (email === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASSWORD) {
       const user = {
         id: 'admin-patrick',
         email: ADMIN_EMAIL,
