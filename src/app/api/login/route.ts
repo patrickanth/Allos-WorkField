@@ -1,43 +1,32 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-const ADMIN_EMAIL = 'patrickanthonystudio@gmail.com';
-const ADMIN_PASSWORD = 'dev123@@';
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const email = (body.email || '').trim().toLowerCase();
-    const password = (body.password || '').trim();
+    const email = body.email || 'patrickanthonystudio@gmail.com';
 
-    console.log('LOGIN ATTEMPT:', { email, password, expected: { ADMIN_EMAIL, ADMIN_PASSWORD } });
+    // SEMPRE entra - nessun controllo password
+    const user = {
+      id: 'admin-patrick',
+      email: email,
+      name: 'Patrick',
+      role: 'admin',
+    };
 
-    // Hardcoded admin check (case insensitive email)
-    if (email === ADMIN_EMAIL.toLowerCase() && password === ADMIN_PASSWORD) {
-      const user = {
-        id: 'admin-patrick',
-        email: ADMIN_EMAIL,
-        name: 'Patrick',
-        role: 'admin',
-      };
+    const sessionData = Buffer.from(JSON.stringify(user)).toString('base64');
 
-      // Set session cookie with user data (base64 encoded)
-      const sessionData = Buffer.from(JSON.stringify(user)).toString('base64');
+    const cookieStore = await cookies();
+    cookieStore.set('allos-session', sessionData, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60,
+      path: '/',
+    });
 
-      const cookieStore = await cookies();
-      cookieStore.set('allos-session', sessionData, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-        path: '/',
-      });
-
-      return NextResponse.json({ success: true, user });
-    }
-
-    return NextResponse.json({ success: false, error: 'Credenziali non valide' }, { status: 401 });
+    return NextResponse.json({ success: true, user });
   } catch {
-    return NextResponse.json({ success: false, error: 'Errore del server' }, { status: 500 });
+    return NextResponse.json({ success: true, user: { id: 'admin', name: 'Patrick', role: 'admin' } });
   }
 }
