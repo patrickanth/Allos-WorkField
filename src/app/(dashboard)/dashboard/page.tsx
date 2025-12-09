@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { format, formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import type { Note, Ticket, Activity } from '@/types';
+import TutorialModal from '@/components/tutorial/TutorialModal';
 
 interface DashboardStats {
   totalNotes: number;
@@ -27,6 +28,20 @@ export default function DashboardPage() {
   const [recentTickets, setRecentTickets] = useState<Ticket[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  // Check if tutorial should be shown (set by login sequence)
+  useEffect(() => {
+    const shouldShowTutorial = localStorage.getItem('workfield_show_tutorial');
+    if (shouldShowTutorial === 'true') {
+      // Small delay to let the dashboard load first
+      const timer = setTimeout(() => {
+        setShowTutorial(true);
+        localStorage.removeItem('workfield_show_tutorial');
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   useEffect(() => {
     fetchDashboardData();
@@ -444,6 +459,12 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Tutorial Modal */}
+      <TutorialModal
+        isOpen={showTutorial}
+        onClose={() => setShowTutorial(false)}
+      />
     </div>
   );
 }
