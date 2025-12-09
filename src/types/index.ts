@@ -22,11 +22,11 @@ export interface User {
 }
 
 export interface UserPreferences {
-  darkMode: boolean;
+  theme: 'dark' | 'light' | 'system';
   notifications: boolean;
   emailNotifications: boolean;
+  soundEnabled: boolean;
   language: 'it' | 'en';
-  compactView: boolean;
 }
 
 export interface UserWithPassword extends User {
@@ -155,17 +155,16 @@ export interface CalendarEvent {
   id: string;
   title: string;
   description?: string | null;
-  type: EventType;
-  startDate: Date;
-  endDate?: Date | null;
-  allDay: boolean;
-  color?: string;
+  type: EventType | 'event';
+  date: string;
+  endDate?: string | null;
+  isAllDay: boolean;
+  color: string;
   relatedTicketId?: string | null;
-  authorId: string;
+  userId: string;
   teamId?: string | null;
-  author?: User;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

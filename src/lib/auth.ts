@@ -111,6 +111,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         teamId: token.teamId as string | null,
         teamName: token.teamName as string | null,
         teamSlug: token.teamSlug as string | null,
+        emailVerified: null,
       };
       return session;
     },

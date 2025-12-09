@@ -36,7 +36,7 @@ export async function POST() {
     });
 
     // Remove user from team
-    users.update(session.user.id, { teamId: null, role: 'user' });
+    users.update(session.user.id, { teamId: null, role: 'member' });
 
     return NextResponse.json({ success: true });
   } catch (error) {

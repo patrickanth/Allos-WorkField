@@ -30,7 +30,7 @@ export async function GET() {
     const stats = {
       totalNotes: teamNotes.length,
       totalTickets: teamTickets.length,
-      openTickets: teamTickets.filter(t => t.status === 'open' || t.status === 'in-progress').length,
+      openTickets: teamTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length,
       closedTickets: teamTickets.filter(t => t.status === 'closed' || t.status === 'resolved').length,
       membersCount: teamMembers.length,
     };

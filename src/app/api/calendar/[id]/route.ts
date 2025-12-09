@@ -95,14 +95,6 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 });
     }
 
-    activityLog.create({
-      type: 'event_deleted',
-      description: `${session.user.name} ha eliminato l'evento: ${event.title}`,
-      userId: session.user.id,
-      teamId: session.user.teamId || null,
-      metadata: { eventId: id },
-    });
-
     calendarEvents.delete(id);
     return NextResponse.json({ success: true });
   } catch (error) {

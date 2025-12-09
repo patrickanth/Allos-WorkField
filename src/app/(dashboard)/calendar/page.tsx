@@ -55,12 +55,20 @@ export default function CalendarPage() {
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
 
   // New event form
-  const [newEvent, setNewEvent] = useState({
+  const [newEvent, setNewEvent] = useState<{
+    title: string;
+    description: string;
+    date: string;
+    endDate: string;
+    type: 'event' | 'deadline' | 'meeting' | 'reminder';
+    color: string;
+    isAllDay: boolean;
+  }>({
     title: '',
     description: '',
     date: '',
     endDate: '',
-    type: 'event' as const,
+    type: 'event',
     color: 'indigo',
     isAllDay: true,
   });

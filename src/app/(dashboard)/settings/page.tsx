@@ -92,7 +92,6 @@ export default function SettingsPage() {
         return;
       }
 
-      await update({ name: newName.trim() });
       setProfileSuccess(true);
       setIsEditingProfile(false);
       setTimeout(() => setProfileSuccess(false), 3000);

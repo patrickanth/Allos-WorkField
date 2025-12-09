@@ -44,7 +44,7 @@ export async function GET() {
       })),
       tickets: userTickets.map((ticket) => ({
         id: ticket.id,
-        title: ticket.title,
+        name: ticket.name,
         description: ticket.description,
         status: ticket.status,
         priority: ticket.priority,

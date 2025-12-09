@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       priority: priority || 'medium',
       reactionTime: reactionTime || null,
       resolutionTime: resolutionTime || null,
-      customFields: customFields ? JSON.stringify(customFields) : null,
+      customFields: customFields || undefined,
       authorId: session.user.id,
       assigneeId: assigneeId || null,
       teamId: session.user.teamId,

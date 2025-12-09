@@ -76,11 +76,11 @@ function generateInviteCode(): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const defaultPreferences: UserPreferences = {
-  darkMode: true,
+  theme: 'dark',
   notifications: true,
   emailNotifications: false,
+  soundEnabled: true,
   language: 'it',
-  compactView: false,
 };
 
 export const users = {
@@ -137,7 +137,7 @@ export const users = {
     return userWithoutPassword;
   },
 
-  update: (id: string, data: Partial<User>): User | undefined => {
+  update: (id: string, data: Partial<UserWithPassword>): User | undefined => {
     const allUsers = readData<UserWithPassword>(USERS_FILE);
     const index = allUsers.findIndex(u => u.id === id);
     if (index === -1) return undefined;
@@ -693,7 +693,7 @@ export const calendarEvents = {
     const allEvents = readData<CalendarEvent>(EVENTS_FILE);
     return allEvents.filter(e => {
       if (teamId && e.teamId !== teamId) return false;
-      const eventStart = new Date(e.startDate);
+      const eventStart = new Date(e.date);
       return eventStart >= start && eventStart <= end;
     });
   },
@@ -709,8 +709,8 @@ export const calendarEvents = {
     const newEvent: CalendarEvent = {
       ...data,
       id: uuidv4(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     allEvents.push(newEvent);
     writeData(EVENTS_FILE, allEvents);
@@ -725,7 +725,7 @@ export const calendarEvents = {
     allEvents[index] = {
       ...allEvents[index],
       ...data,
-      updatedAt: new Date(),
+      updatedAt: new Date().toISOString(),
     };
     writeData(EVENTS_FILE, allEvents);
     return allEvents[index];

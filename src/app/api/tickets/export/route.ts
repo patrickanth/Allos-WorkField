@@ -39,14 +39,9 @@ export async function GET(request: NextRequest) {
 
       // Add custom fields if present
       if (ticket.customFields) {
-        try {
-          const customFields = JSON.parse(ticket.customFields);
-          Object.entries(customFields).forEach(([key, value]) => {
-            baseData[key] = value;
-          });
-        } catch {
-          // Ignore parsing errors
-        }
+        Object.entries(ticket.customFields).forEach(([key, value]) => {
+          baseData[key] = value;
+        });
       }
 
       return baseData;

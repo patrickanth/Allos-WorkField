@@ -13,7 +13,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
 
     // Get activities for user and team
-    const activities = activityLog.getByTeam(session.user.teamId, limit);
+    const teamId = session.user.teamId || 'team-default';
+    const activities = activityLog.getByTeam(teamId, limit);
 
     return NextResponse.json(activities);
   } catch (error) {

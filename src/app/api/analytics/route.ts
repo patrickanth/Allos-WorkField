@@ -99,10 +99,10 @@ export async function GET(request: NextRequest) {
       const dateStr = date.toISOString().split('T')[0];
 
       const notesOnDay = uniqueNotes.filter(
-        (n) => n.createdAt.split('T')[0] === dateStr
+        (n) => new Date(n.createdAt).toISOString().split('T')[0] === dateStr
       ).length;
       const ticketsOnDay = allTickets.filter(
-        (t) => t.createdAt.split('T')[0] === dateStr
+        (t) => new Date(t.createdAt).toISOString().split('T')[0] === dateStr
       ).length;
 
       activityByDay.push({
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
           const memberNotes = uniqueNotes.filter((n) => n.authorId === member.id);
           const memberTickets = allTickets.filter((t) => t.authorId === member.id);
           const memberClosedTickets = allTickets.filter(
-            (t) => t.assignedTo === member.id && (t.status === 'closed' || t.status === 'resolved')
+            (t) => t.assigneeId === member.id && (t.status === 'closed' || t.status === 'resolved')
           );
 
           return {

@@ -89,7 +89,6 @@ export default function TeamPage() {
         setError(data.error || 'Errore');
         return;
       }
-      await update({ teamId: data.id, teamName: data.name, teamSlug: data.slug });
       setTeam(data);
       setIsCreateModalOpen(false);
       setNewTeamName('');
@@ -116,7 +115,6 @@ export default function TeamPage() {
         setError(data.error || 'Codice non valido');
         return;
       }
-      await update({ teamId: data.id, teamName: data.name, teamSlug: data.slug });
       setTeam(data);
       setIsJoinModalOpen(false);
       setJoinCode('');
@@ -141,7 +139,6 @@ export default function TeamPage() {
         setError(data.error || 'Errore');
         return;
       }
-      await update({ teamId: 'team-default', teamName: null, teamSlug: null });
       setTeam(null);
       setTeamStats(null);
       setIsLeaveModalOpen(false);
@@ -488,7 +485,7 @@ export default function TeamPage() {
 
         {activeTab === 'members' && (
           <div className="divide-y divide-white/[0.04]">
-            {team.members?.map((member) => (
+            {(team.members as TeamMember[] | undefined)?.map((member) => (
               <div key={member.id} className="p-6 flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors">
                 <div className="flex items-center gap-4 min-w-0">
                   <div className={`avatar w-12 h-12 rounded-xl text-[15px] shrink-0 ${member.role === 'admin' ? 'avatar-glow' : ''}`}>
@@ -554,7 +551,7 @@ export default function TeamPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[14px] text-zinc-300 leading-relaxed">{activity.description}</p>
-                    <p className="text-[12px] text-zinc-600 mt-1">{formatTimeAgo(activity.createdAt)}</p>
+                    <p className="text-[12px] text-zinc-600 mt-1">{formatTimeAgo(activity.createdAt.toString())}</p>
                   </div>
                 </div>
               ))
