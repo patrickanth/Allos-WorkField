@@ -27,6 +27,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const email = credentials.email as string;
         const password = credentials.password as string;
 
+        // Hardcoded admin credentials - always works in dev and prod
+        const ADMIN_EMAIL = 'patrickanthonystudio@gmail.com';
+        const ADMIN_PASSWORD = 'dev123@@';
+
+        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+          return {
+            id: 'admin-patrick',
+            email: ADMIN_EMAIL,
+            name: 'Patrick',
+            avatar: null,
+            role: 'admin',
+            teamId: null,
+            teamName: null,
+            teamSlug: null,
+          };
+        }
+
+        // Fallback to database check for other users
         const user = users.getByEmailWithPassword(email);
         if (!user) {
           return null;
