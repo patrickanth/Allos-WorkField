@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "setup": "mkdir -p data && npm run dev"
+    "seed": "node scripts/seed-user.js",
+    "setup": "node scripts/seed-user.js && npm run dev"
   },
   "keywords": [
     "workspace",
