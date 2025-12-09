@@ -13,7 +13,7 @@ interface UserPreferences {
 }
 
 export default function SettingsPage() {
-  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: null, role: 'admin' } }; const update = () => {};
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: 'team-default', role: 'admin' } }; const update = () => {};
   const router = useRouter();
 
   // Profile edit state
@@ -201,7 +201,8 @@ export default function SettingsPage() {
     try {
       const res = await fetch('/api/user', { method: 'DELETE' });
       if (res.ok) {
-        await signOut({ callbackUrl: '/login' });
+        await fetch('/api/logout', { method: 'POST' });
+        router.push('/login');
       }
     } catch (error) {
       console.error('Delete error:', error);
@@ -481,7 +482,10 @@ export default function SettingsPage() {
             <p className="text-[14px] text-zinc-500">Disconnetti questa sessione dal tuo account</p>
           </div>
           <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
+            onClick={async () => {
+              await fetch('/api/logout', { method: 'POST' });
+              router.push('/login');
+            }}
             className="btn btn-danger shrink-0"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

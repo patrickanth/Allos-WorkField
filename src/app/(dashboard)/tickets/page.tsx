@@ -29,7 +29,7 @@ const priorityOptions: { value: TicketPriority; label: string; color: string }[]
 const categoryOptions = ['Bug', 'Feature', 'Support', 'Altro'];
 
 export default function TicketsPage() {
-  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: null, role: 'admin' } };
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: 'team-default', role: 'admin' } };
   const [tickets, setTickets] = useState<TicketWithRelations[]>([]);
   const [teamMembers, setTeamMembers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);

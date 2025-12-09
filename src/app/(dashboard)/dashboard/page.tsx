@@ -21,7 +21,7 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
-  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: null, role: 'admin' } };
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: 'team-default', role: 'admin' } };
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const [recentTickets, setRecentTickets] = useState<Ticket[]>([]);

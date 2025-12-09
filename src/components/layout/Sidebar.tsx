@@ -107,30 +107,30 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-80 h-screen sticky top-0 flex flex-col bg-[#0a0a0c]/80 backdrop-blur-xl border-r border-white/[0.06]">
+    <aside className="w-64 h-screen sticky top-0 flex flex-col bg-[#0a0a0c]/80 backdrop-blur-xl border-r border-white/[0.06]">
       {/* Logo */}
-      <div className="h-24 flex items-center px-12 border-b border-white/[0.06]">
-        <Link href="/notes" className="flex items-center gap-4">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-white to-zinc-300 flex items-center justify-center shadow-lg shadow-white/10">
-            <span className="text-base font-bold text-black">A</span>
+      <div className="h-20 flex items-center px-6 border-b border-white/[0.06]">
+        <Link href="/notes" className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white to-zinc-300 flex items-center justify-center shadow-lg shadow-white/10">
+            <span className="text-sm font-bold text-black">A</span>
           </div>
           <div>
-            <span className="text-lg font-bold text-white tracking-tight">Allos</span>
-            <p className="text-[11px] text-zinc-500 font-medium tracking-wide">WORKFIELD</p>
+            <span className="text-base font-bold text-white tracking-tight">Allos</span>
+            <p className="text-[10px] text-zinc-500 font-medium tracking-wide">WORKFIELD</p>
           </div>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-8 py-8 space-y-2">
-        <p className="px-5 mb-5 text-[11px] font-bold text-zinc-600 uppercase tracking-widest">Menu</p>
+      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+        <p className="px-4 mb-4 text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Menu</p>
         {navigation.map((item) => {
           const active = isActive(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-4 h-12 px-5 rounded-xl text-[14px] font-medium transition-all duration-200 ${
+              className={`flex items-center gap-3 h-11 px-4 rounded-xl text-[13px] font-medium transition-all duration-200 ${
                 active
                   ? 'bg-white/[0.08] text-white shadow-lg shadow-black/20'
                   : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
@@ -144,10 +144,10 @@ export default function Sidebar() {
       </nav>
 
       {/* Settings link */}
-      <div className="px-8 pb-6 border-t border-white/[0.06] pt-6">
+      <div className="px-4 pb-4 border-t border-white/[0.06] pt-4">
         <Link
           href="/settings"
-          className={`flex items-center gap-4 h-12 px-5 rounded-xl text-[14px] font-medium transition-all duration-200 ${
+          className={`flex items-center gap-3 h-11 px-4 rounded-xl text-[13px] font-medium transition-all duration-200 ${
             pathname === '/settings'
               ? 'bg-white/[0.08] text-white shadow-lg shadow-black/20'
               : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
@@ -164,18 +164,18 @@ export default function Sidebar() {
       </div>
 
       {/* User */}
-      <div className="px-8 pb-8 border-t border-white/[0.06] pt-6">
+      <div className="px-4 pb-4 border-t border-white/[0.06] pt-4">
         <div className="relative">
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-white/[0.04] transition-all duration-200"
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.04] transition-all duration-200"
           >
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-base font-bold text-white shadow-lg shadow-indigo-500/20">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-indigo-500/20">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 text-left min-w-0">
-              <p className="text-[14px] font-semibold text-white truncate">{user.name}</p>
-              <p className="text-[12px] text-zinc-500 truncate">{user.email}</p>
+              <p className="text-[13px] font-semibold text-white truncate">{user.name}</p>
+              <p className="text-[11px] text-zinc-500 truncate">{user.email}</p>
             </div>
             <svg className={`w-4 h-4 text-zinc-500 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -183,15 +183,15 @@ export default function Sidebar() {
           </button>
 
           {showUserMenu && (
-            <div className="absolute bottom-full left-0 right-0 mb-3 bg-zinc-900/95 backdrop-blur-xl border border-white/[0.08] rounded-xl p-2 shadow-2xl shadow-black/50">
+            <div className="absolute bottom-full left-0 right-0 mb-2 bg-zinc-900/95 backdrop-blur-xl border border-white/[0.08] rounded-xl p-2 shadow-2xl shadow-black/50">
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[14px] font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                className="w-full flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                Esci dall&apos;account
+                Esci
               </button>
             </div>
           )}

@@ -23,7 +23,7 @@ interface TeamMember extends User {
 }
 
 export default function TeamPage() {
-  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: null, role: 'admin' } }; const update = () => {};
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', email: 'patrickanthonystudio@gmail.com', teamId: 'team-default', role: 'admin' } }; const update = () => {};
   const router = useRouter();
   const [team, setTeam] = useState<(Team & { members?: TeamMember[] }) | null>(null);
   const [teamStats, setTeamStats] = useState<TeamStats | null>(null);
@@ -141,7 +141,7 @@ export default function TeamPage() {
         setError(data.error || 'Errore');
         return;
       }
-      await update({ teamId: null, teamName: null, teamSlug: null });
+      await update({ teamId: 'team-default', teamName: null, teamSlug: null });
       setTeam(null);
       setTeamStats(null);
       setIsLeaveModalOpen(false);

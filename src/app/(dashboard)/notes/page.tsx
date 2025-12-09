@@ -27,7 +27,7 @@ type NoteWithAuthor = Note & { author?: { id: string; name: string; avatar: stri
 export default function NotesPage() {
   const searchParams = useSearchParams();
   // Hardcoded session
-  const session = { user: { id: 'admin-patrick', name: 'Patrick', teamId: null } };
+  const session = { user: { id: 'admin-patrick', name: 'Patrick', teamId: 'team-default' } };
   const view = searchParams.get('view') || 'private';
 
   const [notes, setNotes] = useState<NoteWithAuthor[]>([]);
